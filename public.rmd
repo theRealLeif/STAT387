@@ -1,7 +1,7 @@
 ---
 title: "STAT 387"
 subtitle: "Introduction to Statistical Learning, Winter 2023" 
-author: Alana Leif, Sang
+author: Alana, Leif, Sang
 output: 
   rmdformats::downcute:
     highlight: tango
@@ -84,7 +84,6 @@ library(kableExtra) # Generate 90 % of complex/advanced/self-customized/beautifu
 library(latex2exp)  # Latex axis titles in ggplot2
 library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 slope parameters
 library(plotly)     # User interactive plots
-
 library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 regressors
 library(olsrr)      # Model selections 
 library(leaps)      # Regression subsetting 
@@ -108,7 +107,7 @@ if (!is.null(current_dir)) {
 
 ---
 
-#Instructions:
+# Instructions:
 
 - Due date: March 21
 - Submit a typed report.
