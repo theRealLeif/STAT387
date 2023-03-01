@@ -1,0 +1,19 @@
+---
+title: "Final Stat"
+output: html_document
+date: "2023-03-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+winequal <- read.csv("winequality-white.csv", sep=';')
+winequal$quality[winequal$quality < 7] <- 0
+winequal$quality[winequal$quality >= 7] <- 1
+#winequal$quality <- cut(winequal$quality, breaks = c(-1, 0, 1), labels = c("Not Good", "Good"))
+
+wine_mod <- lm(quality ~ fixed.acidity + volatile.acidity + citric.acid + residual.sugar + chlorides + free.sulfur.dioxide + total.sulfur.dioxide + density + pH + sulphates + alcohol, winequal)
+summary(wine_mod)
+```
