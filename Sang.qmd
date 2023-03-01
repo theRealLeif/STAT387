@@ -70,7 +70,6 @@ library(kableExtra) # Generate 90 % of complex/advanced/self-customized/beautifu
 library(latex2exp)  # Latex axis titles in ggplot2
 library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 slope parameters
 library(plotly)     # User interactive plots
-
 library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 regressors
 library(olsrr)      # Model selections 
 library(leaps)      # Regression subsetting 
