@@ -107,7 +107,7 @@ if (!is.null(current_dir)) {
 
 ---
 
-# Instructions:
+## Instructions:
 
 - Due date: March 21
 - Submit a typed report.
