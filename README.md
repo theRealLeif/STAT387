@@ -5,7 +5,7 @@
 </p>
 
 <h1 align="center">Introduction to Statistical Learning</h1>
-<p align="center">STAT 387</p>
+<p align="center">STAT 387 Winter 23</p>
 
 ```
 📦STAT 387 Final Project
