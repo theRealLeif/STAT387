@@ -1,0 +1,273 @@
+---
+title: "Introduction to Statistical Learning"
+subtitle: "STAT 387" 
+author: "Sang Xing"
+format: 
+  html:
+    df-print: paged
+    theme:
+      light: materia
+      dark: slate
+    toc: true
+    toc-title: Table of Contents
+    toc-depth: 4
+    toc-location: right
+    number-sections: false
+    number-depth: 3
+    anchor-sections: true
+    smooth-scroll: true
+    link-external-icon: false
+    link-external-newwindow: true
+    code-fold: false
+    code-overflow: scroll
+    code-tools: 
+      source: true
+      toggle: true
+      caption: none
+    code-summary: "Show the code"
+    highlight-style: atom-one
+    link-external-filter: '^(?:http:|https:)\/\/www\.quarto\.org\/custom'
+    html-math-method:
+      method: mathjax
+      url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+---
+
+\vspace{-1cm}
+
+```{r setup, include=FALSE}
+library(tidyverse)  # Load core packages: 
+# ggplot2,   for data visualization.
+# dplyr,     for data manipulation.
+# tidyr,     for data tidying.
+# purrr,     for functional programming.
+# tibble,    for tibbles, a modern re-imagining of data frames.
+# stringr,   for strings.
+# forcats,   for factors.
+# lubridate, for date/times.
+# readr,     for reading .csv, .tsv, and .fwf files.
+# readxl,    for reading .xls, and .xlxs files.
+# feather,   for sharing with Python and other languages.
+# haven,     for SPSS, SAS and Stata files.
+# httr,      for web apis.
+# jsonlite   for JSON.
+# rvest,     for web scraping.
+# xml2,      for XML.
+# modelr,    for modelling within a pipeline
+# broom,     for turning models into tidy data
+# hms,       for times.
+
+library(magrittr)   # Pipeline operator
+library(lobstr)     # Visualizing abstract syntax trees, stack trees, and object sizes
+library(pander)     # Exporting/converting complex pandoc documents, EX: df to Pandoc table
+library(ggforce)    # More plot functions on top of ggplot2
+library(ggpubr)     # Automatically add p-values and significance levels  plots. 
+# Arrange and annotate multiple plots on the same page. 
+# Change graphical parameters such as colors and labels.
+library(sf)         # Geo-spatial vector manipulation: points, lines, polygons
+library(kableExtra) # Generate 90 % of complex/advanced/self-customized/beautiful tables
+library(latex2exp)  # Latex axis titles in ggplot2
+library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 slope parameters
+library(plotly)     # User interactive plots
+library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 regressors
+library(olsrr)      # Model selections 
+library(leaps)      # Regression subsetting 
+library(pls)        # Partial Least squares
+library(MASS)       # LDA, QDA, OLS, Ridge Regression, Box-Cox, stepAIC, etc,.
+library(e1071)      # Naive Bayesian Classfier,SVM, GKNN, ICA, LCA
+library(class)      # KNN, SOM, LVQ
+library(ROCR)       # Precision/Recall/Sensitivity/Specificity performance plot 
+library(boot)       # LOOCV, Bootstrap,
+library(caret)      # Classification/Regression Training, run ?caret::trainControl
+library(corrgram)   # for correlation matrix
+library(corrplot)   # for graphical display of correlation matrix
+
+set.seed(1234)        # make random results reproducible
+
+current_dir <- getwd()
+
+if (!is.null(current_dir)) {
+  setwd(current_dir)
+  remove(current_dir)
+}
+```
+
+```{css, echo=FALSE}
+body {
+font-family: "Times New Roman";
+font-size: 0.8em;
+}
+
+h2, .h2, h2.anchored, 
+h3, .h3, h3.anchored,
+.quarto-title, 
+.quarto-title-meta {
+text-align: center;
+}
+
+h2, .h2 {
+font-size: 1.5em;
+}
+
+h3, .h3 {
+font-size: 1.25em;
+}
+
+h4, .h4 {
+font-size: 1em;
+}
+
+h5, .h5 {
+font-size: 0.75em;
+}
+
+h6, .h6 {
+font-size: 0.7em;
+}
+
+.quarto-title-meta {
+display: block!important;
+}
+
+.quarto-title-meta-heading {
+display: none;
+}
+
+code {
+color: #61AFEF;
+}
+
+.btn {
+border-color: #f8f9fa9e!important;
+}
+
+body.quarto-dark {
+background-color: #282c34;
+
+color: #d8dee9;
+
+.pagedtable .even {
+background-color: #3b4252!important;
+}
+
+p code:not(.sourceCode), li code:not(.sourceCode) {
+background-color: #4c566a!important;
+}
+}
+```
+
+
+## Preamble
+
+Consider the wine quality dataset from [UCI Machine Learning Respository](https://archive.ics.uci.edu/ml/datasets/Wine+Quality). We will focus only on the data concerning white wines (and not red wines). Dichotomize the `quality` variable as `good`, which takes the value 1 if quality ≥ 7 and the value 0, otherwise. We will take `good` as response and all the 11 physiochemical characteristics of the wines in the data as predictors.
+
+### Problem Statements
+
+Use 10-fold cross-validation for estimating the test error rates below and compute the estimates using `caret` package with seed set to 1234 before each computation.
+
+(a) Fit a KNN with K chosen optimally using test error rate. Report error rate, sensitivity, specificity, and AUC for the optimal KNN based on the training data. Also, report its estimated test error rate.
+(b) Repeat (a) using logistic regression.
+(c) Repeat (a) using LDA.
+(d) Repeat (a) using QDA.
+(e) Compare the results in (a)-(d). Which classifier would you recommend? Justify your answer.
+
+
+
+### Methodologies
+- KNN
+- GLM/logit/glmnet
+- LDA
+- QDA
+- Naive Bayes
+- Random Forest
+- Decision Tree
+- Regression Tree
+- SVM
+- Regression/Multi-Regression
+
+
+## Exploratory Analysis
+
+
+### Data Import
+```{r data_import}
+wine.data <- read.csv("data\\winequality-white.csv", sep=";", header = T)
+
+wine.data <-  wine.data %>% mutate(good = ifelse(quality>=7, 1, 0))
+
+head(wine.data)
+```
+
+### Basic Analysis
+```{r basic_analysis}
+dim(wine.data)
+
+#Removing the Duplicate Rows
+wine.data <- wine.data[!duplicated(wine.data), ]
+
+dim(wine.data)
+
+str(wine.data)
+summary(wine.data)
+
+#Check for NA in dataset
+sum(is.na(wine.data))
+
+#Response count in the dataset
+table(wine.data$quality)
+```
+
+### Data Histograms
+```{r hist, warning=FALSE}
+wine.colnames <- colnames(wine.data[, 1:12])
+num_plots     <- length(wine.colnames)
+num_rows      <- ceiling(num_plots/3)
+
+
+# Create an empty list to store plots
+grid_arr      <- list()
+
+
+# Loop over each column name in the wine.colnames vector
+for(i in 1:num_plots) {
+  # Create a ggplot object for the current column using aes
+  plt <- ggplot(data = wine.data, aes_string(x = wine.colnames[i])) +
+    geom_histogram(binwidth = diff(range(wine.data[[wine.colnames[i]]]))/30, 
+                   color = "black", fill = "slategray3") +
+    labs(x = wine.colnames[i], y = "Frequency") +
+    theme_bw()
+  
+  # Add the current plot to the grid_arr list
+  grid_arr[[i]] <- plt
+}
+
+grid_arr <- do.call(gridExtra::grid.arrange, c(grid_arr, ncol = 3))
+
+remove(grid_arr)
+remove(plt)
+```
+
+### Data Relationships
+```{r relation_plot, fig.width=10, fig.height=5, message=FALSE}
+reshape2::melt(wine.data[, 1:12], "quality") %>% 
+  ggplot(aes(value, quality, color = variable)) +  
+  geom_point() + 
+  geom_smooth(aes(value,quality, colour=variable), method=lm, se=FALSE)+
+  facet_wrap(.~variable, scales = "free")
+
+#Collinearity between Attributes
+cor(wine.data) %>% 
+  corrplot::corrplot(method = 'number',  type = "lower", tl.col = "steelblue", number.cex = 0.5)
+```
+
+
+## K-Nearest Neightbor
+
+
+## Logistic Regression
+
+
+## Linear Discriminant Analysis
+
+
+## Quadratic discriminant analysis
+
