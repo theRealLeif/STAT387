@@ -35,23 +35,15 @@ Which of the following classifiers would you recommend? Justify your answer.
  ┃ ┃ ┃ ┣ 📄winequality-white.csv
  ┃ ┃ ┃ ┗ 📄winequality.names
  ┃ ┃ ┣ 📂report                     // Paper Report
- ┃ ┃ ┃ ┣ 📄report_PDF.pdf
- ┃ ┃ ┃ ┗ 📄report_PDF.rmd
- ┃ ┃ ┣ 📄Step.1_KNN.R
- ┃ ┃ ┣ 📄Step.2_Logit.R
- ┃ ┃ ┣ 📄Step.3_LDA.R
- ┃ ┃ ┣ 📄Step.4_QDA.R
- ┃ ┃ ┣ 📄Step.99_Complete_Code.html
- ┃ ┃ ┣ 📄Step.99_Complete_Code.R
- ┃ ┃ ┗ 📄Step.99_Complete_Code.rmd
- ┃ ┃ ┣ 📄Public.html
- ┃ ┃ ┣ 📄Public.rmd
- ┃ ┃ ┣ 📄Step.1_KNN.R
- ┃ ┃ ┣ 📄Step.2_Logit.R
- ┃ ┃ ┣ 📄Step.3_LDA.R
- ┃ ┃ ┣ 📄Step.4_QDA.R
- ┃ ┃ ┗ 📄Step.99_Complete_Code.R
+ ┃ ┃ ┃ ┣ 📜Final Report.pdf
+ ┃ ┃ ┃ ┗ 📜Final Report.rmd
+ ┃ ┃ ┣ 📜Step.1_KNN.R
+ ┃ ┃ ┣ 📜Step.2_Logit.R
+ ┃ ┃ ┣ 📜Step.3_LDA.R
+ ┃ ┃ ┣ 📜Step.4_QDA.R
+ ┃ ┃ ┗ 📜Step.99_Complete_Code.R
  ┃ ┗ 📂Sang
+ ┃ ┗ 📂Web                          // Repo Website
  ┗ 📄README.md
 ```
 
