@@ -111,6 +111,7 @@ if (!is.null(current_dir)) {
 
 - Due date: March 21
 - Submit a typed report.
+- Do a good job
 
 ---
 

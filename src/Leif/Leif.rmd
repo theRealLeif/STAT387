@@ -13,11 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #get the white wine data and clean it . 
 ```{r}
+data <- read.csv("data\\winequality-white.csv", sep = ";", header = T)
 
-data <- read.csv("data\\winequality-white.csv", sep = ";" )
+data <-  data %>% mutate(good = ifelse(quality>=7, 1, 0))
 
-write.csv(data, file = "cleaned_data.csv")
-
+head(data)
 ```
 
 ```{r}

@@ -1,35 +1,15 @@
 ---
-title: "\\vspace{-1.5cm} STAT 387"
+title: "STAT 387"
 subtitle: "Introduction to Statistical Learning, Winter 2023" 
-date: "March 21 6 A.M."
-format: 
-  html:
-    df-print: paged
-    theme:
-      light: flatly
-      dark: darkly
-    toc: true
-    toc-title: Table of Contents
-    toc-depth: 3
-    toc-location: right
-    number-sections: false
-    number-depth: 3
-    anchor-sections: true
-    smooth-scroll: true
-    link-external-icon: true
-    link-external-newwindow: false
-    code-fold: true
-    code-overflow: scroll
-    code-tools: 
-      source: true
-      toggle: true
-      caption: none
-    code-summary: "Show the code"
-    highlight-style: atom-one
-    link-external-filter: '^(?:http:|https:)\/\/www\.quarto\.org\/custom'
-    html-math-method:
-      method: mathjax
-      url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+author: Alana, Leif, Sang
+output:
+  pdf_document: 
+    toc_depth: 4
+    latex_engine: xelatex
+    highlight: breezedark
+    df_print: !expr pander::pander
+urlcolor: blue
+fontsize: 12pt 
 ---
 
 \vspace{-1cm}
@@ -93,10 +73,11 @@ if (!is.null(current_dir)) {
 
 ---
 
-#Instructions:
+## Instructions:
 
 - Due date: March 21
 - Submit a typed report.
+- Do a good job
 
 ---
 
