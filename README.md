@@ -1,5 +1,5 @@
 <h1 align="center">Introduction to Statistical Learning</h1>
-<p align="center"><b>#K-nearest neighbor algorithm  &emsp; #Logistic regression &emsp; #Linear Discriminant Analysis &emsp; #Quadratic Discriminant Analysis</b></p>
+<p align="center"><b>#K-nearest neighbor algorithm  &emsp; #Logistic regression &emsp; <br> #Linear Discriminant Analysis &emsp; #Quadratic Discriminant Analysis</b></p>
 
 <p align="center">
 <a href="https://github.com/theRealLeif/STAT387" target="_blank">
