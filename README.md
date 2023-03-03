@@ -43,7 +43,7 @@ Which of the following classifiers would you recommend? Justify your answer.
  ┃ ┃ ┣ 📄Step.4_QDA.R
  ┃ ┃ ┗ 📄Step.99_Complete_Code.R
  ┃ ┗ 📂Sang
- ┃ ┗ 📂Web                          // Repo Website
+ ┃ ┗ 📂web                          // Repo Website
  ┗ 📄README.md
 ```
 
