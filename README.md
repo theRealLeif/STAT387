@@ -1,4 +1,5 @@
 <h1 align="center">Introduction to Statistical Learning</h1>
+<h6 align="center"><small>STAT 387 | Final Project | Winter 2023</small></h6>
 <p align="center"><b>#K-nearest neighbor algorithm  &emsp; #Logistic regression &emsp; <br> #Linear Discriminant Analysis &emsp; #Quadratic Discriminant Analysis</b></p>
 
 <p align="center">
