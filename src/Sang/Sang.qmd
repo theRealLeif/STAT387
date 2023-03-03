@@ -190,7 +190,7 @@ Use 10-fold cross-validation for estimating the test error rates below and compu
 
 ### Data Import
 ```{r data_import}
-wine.data <- read.csv("data\\winequality-white.csv", sep=";", header = T)
+wine.data <- read.csv("dataset\\winequality-white.csv", sep=";", header = T)
 
 wine.data <-  wine.data %>% mutate(good = ifelse(quality>=7, 1, 0))
 
@@ -241,7 +241,9 @@ for(i in 1:num_plots) {
 }
 
 grid_arr <- do.call(gridExtra::grid.arrange, c(grid_arr, ncol = 3))
+```
 
+```{r, echo=FALSE}
 remove(grid_arr)
 remove(plt)
 ```
@@ -258,7 +260,14 @@ reshape2::melt(wine.data[, 1:12], "quality") %>%
 cor(wine.data) %>% 
   corrplot::corrplot(method = 'number',  type = "lower", tl.col = "steelblue", number.cex = 0.5)
 ```
-
+  
+### Data Split
+```{r}
+#splitting the dataset into train and test (2/3rd for train remaining for test)
+inTrain <- caret::createDataPartition(wine.data$good, p = 7/10, list = F)
+train <- wine.data[inTrain,]
+test <- wine.data[-inTrain,]
+```
 
 ## K-Nearest Neightbor
 

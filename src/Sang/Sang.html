@@ -126,6 +126,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#basic-analysis" id="toc-basic-analysis" class="nav-link" data-scroll-target="#basic-analysis">Basic Analysis</a></li>
   <li><a href="#data-histograms" id="toc-data-histograms" class="nav-link" data-scroll-target="#data-histograms">Data Histograms</a></li>
   <li><a href="#data-relationships" id="toc-data-relationships" class="nav-link" data-scroll-target="#data-relationships">Data Relationships</a></li>
+  <li><a href="#data-split" id="toc-data-split" class="nav-link" data-scroll-target="#data-split">Data Split</a></li>
   </ul></li>
   <li><a href="#k-nearest-neightbor" id="toc-k-nearest-neightbor" class="nav-link" data-scroll-target="#k-nearest-neightbor">K-Nearest Neightbor</a></li>
   <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link" data-scroll-target="#logistic-regression">Logistic Regression</a></li>
@@ -260,7 +261,7 @@ background-color: #4c566a!important;
 <section id="data-import" class="level3">
 <h3 class="anchored" data-anchor-id="data-import">Data Import</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>wine.data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"raw_data</span><span class="sc">\\</span><span class="st">winequality-white.csv"</span>, <span class="at">sep=</span><span class="st">";"</span>, <span class="at">header =</span> T)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>wine.data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">winequality-white.csv"</span>, <span class="at">sep=</span><span class="st">";"</span>, <span class="at">header =</span> T)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>wine.data <span class="ot">&lt;-</span>  wine.data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">good =</span> <span class="fu">ifelse</span>(quality<span class="sc">&gt;=</span><span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -380,27 +381,37 @@ background-color: #4c566a!important;
 <div class="cell-output-display">
 <p><img src="Sang_files/figure-html/hist-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">remove</span>(grid_arr)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">remove</span>(plt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+
 </div>
 </section>
 <section id="data-relationships" class="level3">
 <h3 class="anchored" data-anchor-id="data-relationships">Data Relationships</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>reshape2<span class="sc">::</span><span class="fu">melt</span>(wine.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>], <span class="st">"quality"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(value, quality, <span class="at">color =</span> variable)) <span class="sc">+</span>  </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(value,quality, <span class="at">colour=</span>variable), <span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>)<span class="sc">+</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(.<span class="sc">~</span>variable, <span class="at">scales =</span> <span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>reshape2<span class="sc">::</span><span class="fu">melt</span>(wine.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>], <span class="st">"quality"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(value, quality, <span class="at">color =</span> variable)) <span class="sc">+</span>  </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(value,quality, <span class="at">colour=</span>variable), <span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>)<span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(.<span class="sc">~</span>variable, <span class="at">scales =</span> <span class="st">"free"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Sang_files/figure-html/relation_plot-1.png" class="img-fluid" width="960"></p>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Collinearity between Attributes</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(wine.data) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="at">method =</span> <span class="st">'number'</span>,  <span class="at">type =</span> <span class="st">"lower"</span>, <span class="at">tl.col =</span> <span class="st">"steelblue"</span>, <span class="at">number.cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Collinearity between Attributes</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(wine.data) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="at">method =</span> <span class="st">'number'</span>,  <span class="at">type =</span> <span class="st">"lower"</span>, <span class="at">tl.col =</span> <span class="st">"steelblue"</span>, <span class="at">number.cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Sang_files/figure-html/relation_plot-2.png" class="img-fluid" width="960"></p>
 </div>
+</div>
+</section>
+<section id="data-split" class="level3">
+<h3 class="anchored" data-anchor-id="data-split">Data Split</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#splitting the dataset into train and test (2/3rd for train remaining for test)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>inTrain <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">createDataPartition</span>(wine.data<span class="sc">$</span>good, <span class="at">p =</span> <span class="dv">7</span><span class="sc">/</span><span class="dv">10</span>, <span class="at">list =</span> F)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> wine.data[inTrain,]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> wine.data[<span class="sc">-</span>inTrain,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -889,7 +900,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb18-190"><a href="#cb18-190" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-191"><a href="#cb18-191" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Import</span></span>
 <span id="cb18-192"><a href="#cb18-192" aria-hidden="true" tabindex="-1"></a><span class="in">```{r data_import}</span></span>
-<span id="cb18-193"><a href="#cb18-193" aria-hidden="true" tabindex="-1"></a>wine.data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"raw_data</span><span class="sc">\\</span><span class="st">winequality-white.csv"</span>, <span class="at">sep=</span><span class="st">";"</span>, <span class="at">header =</span> T)</span>
+<span id="cb18-193"><a href="#cb18-193" aria-hidden="true" tabindex="-1"></a>wine.data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">winequality-white.csv"</span>, <span class="at">sep=</span><span class="st">";"</span>, <span class="at">header =</span> T)</span>
 <span id="cb18-194"><a href="#cb18-194" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-195"><a href="#cb18-195" aria-hidden="true" tabindex="-1"></a>wine.data <span class="ot">&lt;-</span>  wine.data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">good =</span> <span class="fu">ifelse</span>(quality<span class="sc">&gt;=</span><span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
 <span id="cb18-196"><a href="#cb18-196" aria-hidden="true" tabindex="-1"></a></span>
@@ -940,36 +951,46 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb18-241"><a href="#cb18-241" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb18-242"><a href="#cb18-242" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-243"><a href="#cb18-243" aria-hidden="true" tabindex="-1"></a>grid_arr <span class="ot">&lt;-</span> <span class="fu">do.call</span>(gridExtra<span class="sc">::</span>grid.arrange, <span class="fu">c</span>(grid_arr, <span class="at">ncol =</span> <span class="dv">3</span>))</span>
-<span id="cb18-244"><a href="#cb18-244" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-245"><a href="#cb18-245" aria-hidden="true" tabindex="-1"></a><span class="fu">remove</span>(grid_arr)</span>
-<span id="cb18-246"><a href="#cb18-246" aria-hidden="true" tabindex="-1"></a><span class="fu">remove</span>(plt)</span>
-<span id="cb18-247"><a href="#cb18-247" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-248"><a href="#cb18-248" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-249"><a href="#cb18-249" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Relationships</span></span>
-<span id="cb18-250"><a href="#cb18-250" aria-hidden="true" tabindex="-1"></a><span class="in">```{r relation_plot, fig.width=10, fig.height=5, message=FALSE}</span></span>
-<span id="cb18-251"><a href="#cb18-251" aria-hidden="true" tabindex="-1"></a>reshape2<span class="sc">::</span><span class="fu">melt</span>(wine.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>], <span class="st">"quality"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-252"><a href="#cb18-252" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(value, quality, <span class="at">color =</span> variable)) <span class="sc">+</span>  </span>
-<span id="cb18-253"><a href="#cb18-253" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb18-254"><a href="#cb18-254" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(value,quality, <span class="at">colour=</span>variable), <span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>)<span class="sc">+</span></span>
-<span id="cb18-255"><a href="#cb18-255" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(.<span class="sc">~</span>variable, <span class="at">scales =</span> <span class="st">"free"</span>)</span>
-<span id="cb18-256"><a href="#cb18-256" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-257"><a href="#cb18-257" aria-hidden="true" tabindex="-1"></a><span class="co">#Collinearity between Attributes</span></span>
-<span id="cb18-258"><a href="#cb18-258" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(wine.data) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-259"><a href="#cb18-259" aria-hidden="true" tabindex="-1"></a>  corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="at">method =</span> <span class="st">'number'</span>,  <span class="at">type =</span> <span class="st">"lower"</span>, <span class="at">tl.col =</span> <span class="st">"steelblue"</span>, <span class="at">number.cex =</span> <span class="fl">0.5</span>)</span>
-<span id="cb18-260"><a href="#cb18-260" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-261"><a href="#cb18-261" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-262"><a href="#cb18-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-263"><a href="#cb18-263" aria-hidden="true" tabindex="-1"></a><span class="fu">## K-Nearest Neightbor</span></span>
-<span id="cb18-264"><a href="#cb18-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-265"><a href="#cb18-265" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-266"><a href="#cb18-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-267"><a href="#cb18-267" aria-hidden="true" tabindex="-1"></a><span class="fu">## Logistic Regression</span></span>
-<span id="cb18-268"><a href="#cb18-268" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-269"><a href="#cb18-269" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-270"><a href="#cb18-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## Linear Discriminant Analysis</span></span>
-<span id="cb18-271"><a href="#cb18-271" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-272"><a href="#cb18-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-273"><a href="#cb18-273" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quadratic discriminant analysis</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-244"><a href="#cb18-244" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-245"><a href="#cb18-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-246"><a href="#cb18-246" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, echo=FALSE}</span></span>
+<span id="cb18-247"><a href="#cb18-247" aria-hidden="true" tabindex="-1"></a><span class="fu">remove</span>(grid_arr)</span>
+<span id="cb18-248"><a href="#cb18-248" aria-hidden="true" tabindex="-1"></a><span class="fu">remove</span>(plt)</span>
+<span id="cb18-249"><a href="#cb18-249" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-250"><a href="#cb18-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-251"><a href="#cb18-251" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Relationships</span></span>
+<span id="cb18-252"><a href="#cb18-252" aria-hidden="true" tabindex="-1"></a><span class="in">```{r relation_plot, fig.width=10, fig.height=5, message=FALSE}</span></span>
+<span id="cb18-253"><a href="#cb18-253" aria-hidden="true" tabindex="-1"></a>reshape2<span class="sc">::</span><span class="fu">melt</span>(wine.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>], <span class="st">"quality"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-254"><a href="#cb18-254" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(value, quality, <span class="at">color =</span> variable)) <span class="sc">+</span>  </span>
+<span id="cb18-255"><a href="#cb18-255" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb18-256"><a href="#cb18-256" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(value,quality, <span class="at">colour=</span>variable), <span class="at">method=</span>lm, <span class="at">se=</span><span class="cn">FALSE</span>)<span class="sc">+</span></span>
+<span id="cb18-257"><a href="#cb18-257" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(.<span class="sc">~</span>variable, <span class="at">scales =</span> <span class="st">"free"</span>)</span>
+<span id="cb18-258"><a href="#cb18-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-259"><a href="#cb18-259" aria-hidden="true" tabindex="-1"></a><span class="co">#Collinearity between Attributes</span></span>
+<span id="cb18-260"><a href="#cb18-260" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(wine.data) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-261"><a href="#cb18-261" aria-hidden="true" tabindex="-1"></a>  corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="at">method =</span> <span class="st">'number'</span>,  <span class="at">type =</span> <span class="st">"lower"</span>, <span class="at">tl.col =</span> <span class="st">"steelblue"</span>, <span class="at">number.cex =</span> <span class="fl">0.5</span>)</span>
+<span id="cb18-262"><a href="#cb18-262" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-263"><a href="#cb18-263" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb18-264"><a href="#cb18-264" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Split</span></span>
+<span id="cb18-267"><a href="#cb18-267" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-268"><a href="#cb18-268" aria-hidden="true" tabindex="-1"></a><span class="co">#splitting the dataset into train and test (2/3rd for train remaining for test)</span></span>
+<span id="cb18-269"><a href="#cb18-269" aria-hidden="true" tabindex="-1"></a>inTrain <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">createDataPartition</span>(wine.data<span class="sc">$</span>good, <span class="at">p =</span> <span class="dv">7</span><span class="sc">/</span><span class="dv">10</span>, <span class="at">list =</span> F)</span>
+<span id="cb18-270"><a href="#cb18-270" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> wine.data[inTrain,]</span>
+<span id="cb18-271"><a href="#cb18-271" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> wine.data[<span class="sc">-</span>inTrain,]</span>
+<span id="cb18-272"><a href="#cb18-272" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-273"><a href="#cb18-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-274"><a href="#cb18-274" aria-hidden="true" tabindex="-1"></a><span class="fu">## K-Nearest Neightbor</span></span>
+<span id="cb18-275"><a href="#cb18-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-276"><a href="#cb18-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-277"><a href="#cb18-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-278"><a href="#cb18-278" aria-hidden="true" tabindex="-1"></a><span class="fu">## Logistic Regression</span></span>
+<span id="cb18-279"><a href="#cb18-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-280"><a href="#cb18-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-281"><a href="#cb18-281" aria-hidden="true" tabindex="-1"></a><span class="fu">## Linear Discriminant Analysis</span></span>
+<span id="cb18-282"><a href="#cb18-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-283"><a href="#cb18-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-284"><a href="#cb18-284" aria-hidden="true" tabindex="-1"></a><span class="fu">## Quadratic discriminant analysis</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
