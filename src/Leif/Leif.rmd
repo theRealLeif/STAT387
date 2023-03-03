@@ -7,24 +7,118 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)  # Load core packages
+library(MASS)       # LDA, QDA, OLS, Ridge Regression, Box-Cox, stepAIC, etc,.
+library(e1071)      # Naive Bayesian Classfier,SVM, GKNN, ICA, LCA
+library(class)      # KNN, SOM, LVQ
+library(ROCR)       # Precision/Recall/Sensitivity/Specificity performance plot 
+library(boot)       # LOOCV, Bootstrap,
 ```
 
 
 
 #get the white wine data and clean it . 
 ```{r}
-data <- read.csv("data\\winequality-white.csv", sep = ";", header = T)
+wine_data <- read.csv("data\\winequality-white.csv", sep = ";", header = T)
 
-data <-  data %>% mutate(good = ifelse(quality>=7, 1, 0))
+# this is to convert the quality predictor from numerical into categorical
+wine_data <-  wine_data %>% mutate(good = ifelse(quality>=7, 1, 0))
+wine_data$quality <- NULL
 
-head(data)
+wine_data <- wine_data[!duplicated(wine_data), ]
+
+head(wine_data)
 ```
 
+#looking in to the data we are working with 
+```{r}
+str(wine_data)
+
+
+### spiting the data into train and test sets
+
+
+### Data Split
+#splitting the dataset into train and test (2/3rd for train remaining for test)
+inTrain <- caret::createDataPartition(wine_data$good, p = 7/10, list = F)
+train <- wine_data[inTrain,]
+test <- wine_data[-inTrain,]
+
+
+
+
+
+
+
+```
+
+# fitting a logistic regression 
+```{r}
+
+#wine_glm<- glm(good ~ . ,wine_data)
+#summary(wine_glm)
+
+#w2_glm <- glm(good ~ . -citric.acid, data = wine_data )
+#w2_glm <- logit(good ~ . -citric.acid, data = wine_data )
+#w2_glm$residuals
+#summary(w2_glm)
+
+```
+
+
+
+
+### qda 
 ```{r}
 
 
 
+qda.fit = qda(good ~ . , data = train, family = binomial)
+qda.fit
 
+
+qda.pred  = predict(qda.fit, train)
+names(qda.pred)
+qda.class = qda.pred$class
+length(test$good)
+length(qda.class)
+#      truth   , prediction  
+table(train$good, qda.class )
+# 
+# 
+# qda.tn = sum((Direction.2005 == unique(Direction.2005)[1])&(qda.class == unique(Direction.2005)[1]))
+# qda.tp = sum((Direction.2005 == unique(Direction.2005)[2])&(qda.class == unique(Direction.2005)[2]))
+# 
+# qda.fp = sum((Direction.2005 == unique(Direction.2005)[1])&(qda.class == unique(Direction.2005)[2]))
+# qda.fn = sum((Direction.2005 == unique(Direction.2005)[2])&(qda.class == unique(Direction.2005)[1]))
+# 
+# qda.n = qda.tn + qda.fp
+# qda.p = qda.fn + qda.tp
+# 
+# 
+# 
+# # Specificity, Sensitivity, Overall Error/ Probability of Misclassification #
+# spec.qda  = 1 - (qda.fp/qda.n)
+# sen.qda   = qda.tp/qda.p
+# oer.qda1  = (qda.fn + qda.fp)/(qda.n + qda.p)
+# #oer.qda2  = 1 - mean(qda.class == Direction.2005)
+# 
+# 
+# 
+# # ROCR #
+# qda.pred <- prediction(qda.pred$posterior[,2], Smarket.2005$Direction) 
+# qda.perf <- performance(qda.pred,"tpr","fpr")
+# plot(qda.perf,colorize=TRUE, lwd = 2)
+# abline(a = 0, b = 1) 
+# 
+# 
+# qda.auc = performance(qda.pred, measure = "auc")
+# print(qda.auc@y.values)
+# 
+# 
+# results.matrix[3,] = as.numeric( c(spec.qda, sen.qda, oer.qda1, qda.auc@y.values))
+# 
+# 
 
 ```
 
