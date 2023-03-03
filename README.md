@@ -24,27 +24,28 @@ Which of the following classifiers would you recommend? Justify your answer.
 
 ```
 📦STAT 387 Final Project
- ┣ 📂lib                            // Supplementary Materials
- ┃ ┗ 📄paper.pdf
  ┣ 📂README.asset                   // Raw Assets for README 
+ ┣ 📂lib                            // Supplementary Materials
+ ┃ ┣ 📂img
+ ┃ ┣ 📄paper.pdf
+ ┃ ┣ 📄report.pdf
+ ┃ ┗ 📄report.rmd
  ┣ 📂src                            // Source Code
+ ┃ ┣ 📂data                         // Raw Data
+ ┃ ┃ ┣ 📄winequality-white.csv
+ ┃ ┃ ┗ 📄winequality.names
+ ┃ ┣ 📄Step.1_KNN.R
+ ┃ ┣ 📄Step.2_Logit.R
+ ┃ ┣ 📄Step.3_LDA.R
+ ┃ ┣ 📄Step.4_QDA.R
+ ┃ ┗ 📄Step.99_Complete_Code.R
+ ┣ 📂usr                            // Member Contributions
  ┃ ┣ 📂Alana
  ┃ ┣ 📂Leif
- ┃ ┃ ┗ 📄Leif.rmd
- ┃ ┣ 📂Public                       // Collective Work
- ┃ ┃ ┣ 📂data                       // Raw data
- ┃ ┃ ┃ ┣ 📄winequality-white.csv
- ┃ ┃ ┃ ┗ 📄winequality.names
- ┃ ┃ ┣ 📂report                     // Paper Report
- ┃ ┃ ┃ ┣ 📄Final Report.pdf
- ┃ ┃ ┃ ┗ 📄Final Report.rmd
- ┃ ┃ ┣ 📄Step.1_KNN.R
- ┃ ┃ ┣ 📄Step.2_Logit.R
- ┃ ┃ ┣ 📄Step.3_LDA.R
- ┃ ┃ ┣ 📄Step.4_QDA.R
- ┃ ┃ ┗ 📄Step.99_Complete_Code.R
  ┃ ┗ 📂Sang
- ┃ ┗ 📂web                          // Repo Website
+ ┃ ┗ 📂web   
+ ┣ 📂web                            // Repository Website
+ ┣ 📄.gitignore
  ┗ 📄README.md
 ```
 
