@@ -175,7 +175,7 @@ position: fixed;
 #TOC::before {
 content: "";
 display: block;
-height: 175px;
+height: 141px;
 margin: 20px 20px 20px 20px;
 background-image: url("https://raw.githubusercontent.com/theRealLeif/STAT387/main/README.asset/Logo.svg");
 background-size: contain;
