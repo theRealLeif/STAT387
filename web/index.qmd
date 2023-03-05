@@ -1,7 +1,7 @@
 ---
 title: "Introduction to Statistical Learning"
 subtitle: "STAT 387" 
-author: "Sang Xing"
+author: "Sing Song"
 format: 
   html:
     df-print: paged
@@ -27,6 +27,7 @@ format:
     code-summary: "Show the code"
     highlight-style: atom-one
     link-external-filter: '^(?:http:|https:)\/\/www\.quarto\.org\/custom'
+    embed-resources: false
     html-math-method:
       method: mathjax
       url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -65,6 +66,7 @@ library(ggpubr)     # Automatically add p-values and significance levels  plots.
 # Change graphical parameters such as colors and labels.
 library(sf)         # Geo-spatial vector manipulation: points, lines, polygons
 library(kableExtra) # Generate 90 % of complex/advanced/self-customized/beautiful tables
+library(cowplot)
 library(latex2exp)  # Latex axis titles in ggplot2
 library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 slope parameters
 library(plotly)     # User interactive plots
@@ -153,6 +155,22 @@ p code:not(.sourceCode), li code:not(.sourceCode) {
 background-color: #4c566a!important;
 }
 }
+
+.top-right { 
+position: fixed;
+}
+
+#TOC::before {
+content: "";
+display: block;
+height: 175px;
+margin: 20px 20px 20px 20px;
+background-image: url("https://raw.githubusercontent.com/theRealLeif/STAT387/main/README.asset/Logo.svg");
+background-size: contain;
+background-position: center center;
+background-repeat: no-repeat;
+}
+
 ```
 
 
@@ -184,24 +202,43 @@ Use 10-fold cross-validation for estimating the test error rates below and compu
 - SVM
 - Regression/Multi-Regression
 
+### Data Description
+This is a dataset of wine quality containing 4898 observations of 12 variables. The variables are:
+
+- `fixed.acidity`: The amount of fixed acid in the wine ($g/dm^3$)
+- `volatile.acidity`: The amount of volatile acid in the wine ($g/dm^4$)
+- `citric.acid`: The amount of citric acid in the wine ($g/dm^3$)
+- `residual.sugar`: The amount of residual sugar in the wine ($g/dm^3$)
+- `chlorides`: The amount of salt in the wine ($g/dm^3$)
+- `free.sulfur.dioxide`: The amount of free sulfur dioxide in the wine ($mg/dm^3$)
+- `total.sulfur.dioxide`: The amount of total sulfur dioxide in the wine ($mg/dm^3$)
+- `density`: The density of the wine ($g/dm^3$)
+- `pH`: The $pH$ value of the wine
+- `sulphates`: The amount of sulphates in the wine ($g/dm^3$)
+- `alcohol`: The alcohol content of the wine ($\% vol$)
+- `quality`: The quality score of the wine ($0-10$)
+
+After removing the duplicate rows from our data set, we are left with 3961 observations of the above 11 variables minus `quality` column variable, and introduced a new variable `good` as our response:
+
+- `good`: A binary variable indicating whether the wine is good (`quality` $\geq 7$) or not (`quality` $<7$).
+
 
 ## Exploratory Analysis
 
-
 ### Data Import
 ```{r data_import}
-wine.data <- read.csv("data\\winequality-white.csv", sep=";", header = T)
+wine.data <- read.csv("dataset\\winequality-white.csv", sep=";", header = T)
 
 wine.data <-  wine.data %>% mutate(good = ifelse(quality>=7, 1, 0))
 
 head(wine.data)
 ```
 
-### Basic Analysis
+### Data Analysis
 ```{r basic_analysis}
 dim(wine.data)
 
-#Removing the Duplicate Rows
+# Removing duplicate Rows
 wine.data <- wine.data[!duplicated(wine.data), ]
 
 dim(wine.data)
@@ -209,10 +246,10 @@ dim(wine.data)
 str(wine.data)
 summary(wine.data)
 
-#Check for NA in dataset
+# Check for NAs in dataset
 sum(is.na(wine.data))
 
-#Response count in the dataset
+# Counts at each combination of response's factor levels
 table(wine.data$quality)
 ```
 
@@ -241,9 +278,15 @@ for(i in 1:num_plots) {
 }
 
 grid_arr <- do.call(gridExtra::grid.arrange, c(grid_arr, ncol = 3))
+```
 
+```{r, echo=FALSE}
+# Remove unnecessary variables
 remove(grid_arr)
 remove(plt)
+remove(i)
+remove(num_plots)
+remove(num_rows)
 ```
 
 ### Data Relationships
@@ -254,20 +297,540 @@ reshape2::melt(wine.data[, 1:12], "quality") %>%
   geom_smooth(aes(value,quality, colour=variable), method=lm, se=FALSE)+
   facet_wrap(.~variable, scales = "free")
 
-#Collinearity between Attributes
+# Collinearity between Attributes
 cor(wine.data) %>% 
   corrplot::corrplot(method = 'number',  type = "lower", tl.col = "steelblue", number.cex = 0.5)
+
+# Remove quality from dataset, use good as response 
+wine.data$quality <- NULL 
 ```
 
+### Data Split
+```{r dataSplit}
+# Splitting the dataset into train and test (7/10th for train remaining for test)
+inTrain <- caret::createDataPartition(wine.data$good, p = 7/10, list = F)
+train <- wine.data[inTrain,]
+test <- wine.data[-inTrain,]
+
+
+# Convert the outcome variable to a factor with two levels
+train$good <- as.factor(train$good)
+test$good <- as.factor(test$good)
+```
 
 ## K-Nearest Neightbor
 
+### Model Construction
+```{r modelSaving, eval=FALSE}
+#--------------------#
+#-----K-fold CV------#
+#--------------------#
+
+set.seed(1234)
+# Define the training control object for 10-fold cross-validation
+train_control <- trainControl(method = "cv", number = 10)
+
+# Train the KNN model using 10-fold cross-validation
+# tuneLength argument to specify the range of values of K to be considered for tuning
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control)
+
+# Save the model into .Rdata for future import 
+save(knn_model, file = "dataset\\knn.model_kfoldCV.Rdata")
+
+
+#--------------------------#
+#-----K-fold CV (Mod)------#
+#--------------------------#
+
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control, 
+                   tuneLength = 10)
+
+# Save the model into .Rdata for future import 
+save(knn_model, file = "dataset\\knn.model_kfoldCV_mod.Rdata")
+
+
+#--------------------#
+#----Hold-out CV-----#
+#--------------------#
+
+set.seed(1234)
+train_control <- trainControl(method = "none",)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn")
+
+save(knn_model, file = "dataset\\knn.model_holdoutCV.Rdata")
+
+
+#--------------------------#
+#----Hold-out CV (Mod)-----#
+#--------------------------#
+
+set.seed(1234)
+train_control <- trainControl(method = "none",)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn",
+                   tuneGrid = expand.grid(k=1:30))
+
+save(knn_model, file = "dataset\\knn.model_holdoutCV_mod.Rdata")
+
+
+#--------------------#
+#-------LOOCV--------#
+#--------------------#
+
+set.seed(1234)
+train_control <- trainControl(method = "LOOCV")
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control)
+
+save(knn_model, file = "dataset\\knn.model_looCV.Rdata")
+
+
+#--------------------------#
+#-------LOOCV (Mod)--------#
+#--------------------------#
+
+set.seed(1234)
+train_control <- trainControl(method = "LOOCV")
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control,
+                   tuneLength = 10,
+                   tuneGrid = expand.grid(k = 1:20))
+
+save(knn_model, file = "dataset\\knn.model_looCV_mod.Rdata")
+
+
+#--------------------#
+#----Repeated CV-----#
+#--------------------#
+
+set.seed(1234)
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control)
+
+save(knn_model, file = "dataset\\knn.model_repeatedCV.Rdata")
+
+
+#--------------------------#
+#----Repeated CV (Mod)-----#
+#--------------------------#
+
+set.seed(1234)
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
+
+kknn.grid <- expand.grid(kmax = c(3, 5, 7 ,9, 11), distance = c(1, 2, 3),
+                         kernel = c("rectangular", "gaussian", "cos"))
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "kknn",
+                   trControl = train_control, 
+                   tuneGrid = kknn.grid,
+                   preProcess = c("center", "scale"))
+
+save(knn_model, file = "dataset\\knn.model_repeatedCV_mod.Rdata")
+```
+
+
+### K-fold CV 
+```{r knn.kfoldCV, fig.show='hide'}
+# Import model
+load("dataset\\knn.model_kfoldCV.Rdata")
+
+# Make predictions on the test data using the trained model and calculate the test error rate
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+
+# Convert predictions to a numeric vector
+knn.predictions <- as.numeric(knn.predictions)
+
+# Calculate the AUC using the performance() and auc() functions:
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+# Performance plot for TP and FP
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "ROC Curves from K-fold CV")
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.kfoldCV.perform_obj<- recordPlot()
+
+# Accuracy and Kappa value plot
+knn.accu.kappa.plot <- function(knn.model) {
+  p <- ggplot(data=data.frame(k = knn.model$results$k,
+                              Accuracy = knn.model$results$Accuracy,
+                              Kappa = knn.model$results$Kappa)) +
+    geom_point(aes(x = k, y = Accuracy, color = "Accuracy")) +
+    geom_point(aes(x = k, y = Kappa, color = "Kappa")) +
+    geom_line(aes(x = k, y = Accuracy, linetype = "Accuracy", color = "Accuracy")) +
+    geom_line(aes(x = k, y = Kappa, linetype = "Kappa", color = "Kappa")) +
+    scale_color_manual(values = c("#98c379", "#e06c75"),
+                       guide = guide_legend(override.aes = list(linetype = c(1, 0)) )) +
+    scale_linetype_manual(values=c("solid", "dotted"),
+                          guide = guide_legend(override.aes = list(color = c("#98c379", "#e06c75")))) +
+    labs(x = "K value", 
+         y = "Accuracy / Kappa") +
+    ylim(0, 1) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    guides(color = guide_legend(title = "Metric"),
+           linetype = guide_legend(title = "Metric"))
+  return(p)
+}
+
+knn.kfoldCV.plot <- knn.accu.kappa.plot(knn_model) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("KNN Model Performance (10-Fold CV)")
+```
+
+#### Tuned
+```{r kfoldCV_mod, fig.show='hide'}
+load("dataset\\knn.model_kfoldCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "ROC Curves from Tuned K-fold CV")
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.kfoldCV_mod.perform_obj <- recordPlot()
+
+knn.kfoldCV_mod.plot <- knn.accu.kappa.plot(knn_model) +
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("KNN Model Performance (Tuned 10-Fold CV)")
+```
+
+
+### Hold-out CV (Validation Set Approach)
+```{r knn.holdoutCV, fig.show='hide'}
+load("dataset\\knn.model_holdoutCV.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "ROC Curves from Hold-out CV")
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.holdoutCV.perform_obj <- recordPlot()
+
+knn.holdoutCV.plot <- knn.accu.kappa.plot(knn_model) +
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("KNN Model Performance (Hold-out CV)")
+```
+
+#### Tuned
+```{r knn.holdoutCV_mod, fig.show='hide'}
+load("dataset\\knn.model_holdoutCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "ROC Curves from Tuned Hold-out CV")
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.holdoutCV_mod.perform_obj <- recordPlot()
+
+knn.holdoutCV_mod.plot <- knn.accu.kappa.plot(knn_model) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), hjust = -0.3, angle=90) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), hjust=-0.3, angle=90) +
+  ggtitle("KNN Model Performance (Tuned Hold-out CV)")
+```
+
+
+### LOOCV
+```{r knn.LOOCV, fig.show='hide'}
+load("dataset\\knn.model_looCV.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = 'ROC Curves from LOOCV')
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.looCV.perform_obj <- recordPlot()
+
+knn.looCV.plot <- knn.accu.kappa.plot(knn_model) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("KNN Model Performance (LOOCV)")
+```
+
+#### Tuned
+```{r knn.LOOCV_mod, fig.show='hide'}
+load("dataset\\knn.model_looCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "ROC Curves from Tuned LOOCV")
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.looCV_mod.perform_obj <- recordPlot()
+
+knn.looCV_mod.plot <- knn.accu.kappa.plot(knn_model) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), hjust = -0.3, angle=90) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), hjust = -0.3, angle=90) +
+  ggtitle("KNN Model Performance (Tuned LOOCV)")
+```
+
+
+### Repeated CV
+```{r knn.repeatedCV, fig.show='hide'}
+load("dataset\\knn.model_repeatedCV.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "ROC Curves from Repeated CV")
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.repeatedCV.perform_obj <- recordPlot()
+
+df <- knn_model$results
+knn.repeatedCV.plot <- ggplot(data=df, aes(x = kmax, y = Accuracy)) +
+  geom_point(aes(color = "Accuracy")) +
+  geom_point(aes(color = "Kappa")) +
+  geom_line(aes(linetype = "Accuracy", color = "Accuracy")) +
+  geom_line(aes(y = Kappa, linetype = "Kappa", color = "Kappa")) +
+  geom_text(aes(label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  scale_color_manual(values = c("#98c379", "#e06c75"),
+                     guide = guide_legend(override.aes = list(linetype = c(1, 0)) )) +
+  scale_linetype_manual(values=c("solid", "dotted"),
+                        guide = guide_legend(override.aes = list(color = c("#98c379", "#e06c75")))) +
+  labs(x = "K value", 
+       y = "Accuracy / Kappa",
+       title = "KNN Model Performance (Repeated CV)") +
+  ylim(0, 1) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  guides(color = guide_legend(title = "Metric"),
+         linetype = guide_legend(title = "Metric"))
+```
+
+#### Tuned
+```{r knn.repeatedCV_mod, fig.show='hide'}
+load("dataset\\knn.model_repeatedCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "ROC Curves from Tuned Repeated CV")
+points(auc_val, 1 - auc_val, 
+       col = "steelblue", 
+       pch = 21)
+abline(a = 0, b = 1)
+knn.repeatedCV_mod.perform_obj <- recordPlot()
+
+knn.repeatedCV_mod.plot <- ggplot(knn_model) +
+  labs(x = "K value", 
+       y = "Accuracy", 
+       title = "KNN Model Performance (Tuned Repeated CV)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) 
+```
+
+
+### Summary
+
+```{r Accuracy.Kappa.Plot, fig.width=15, fig.height=20}
+ggarrange(knn.kfoldCV.plot,
+          knn.kfoldCV_mod.plot,
+          knn.holdoutCV.plot,
+          knn.holdoutCV_mod.plot,
+          knn.looCV.plot,
+          knn.looCV_mod.plot,
+          knn.repeatedCV.plot,
+          knn.repeatedCV_mod.plot,
+          ncol = 2, nrow = 4)
+```
+
+```{r, fig.width=10}
+cowplot::plot_grid(knn.kfoldCV.perform_obj, knn.kfoldCV_mod.perform_obj,
+                   ncol = 2, align = "hv", scale = 0.8)
+cowplot::plot_grid(knn.holdoutCV.perform_obj, knn.holdoutCV_mod.perform_obj,
+                   ncol = 2, align = "hv", scale = 0.8)
+cowplot::plot_grid(knn.looCV.perform_obj, knn.looCV_mod.perform_obj,
+                   ncol = 2, align = "hv", scale = 0.8)
+cowplot::plot_grid(knn.repeatedCV.perform_obj, knn.repeatedCV_mod.perform_obj,
+                   ncol = 2, align = "hv", scale = 0.8)
+```
+
+
+
+| Resampling Method    | Error Rate | Sensitivity | Specificity | AUC       |
+| -------------------- | ---------- | ----------- | ----------- | --------- |
+| K-Fold CV            | 0.2273     | 0.9199      | 0.1883      | 0.5541001 |
+| K-Fold CV (Tuned)    | 0.1995     | 0.9768      | 0.1004      | 0.5386181 |
+| Hold-out CV          | 0.2222     | 0.9336      | 0.1590      | 0.5463051 |
+| Hold-out CV  (Tuned) | 0.2022     | 0.9926      | 0.0251      | 0.5088642 |
+| LOOCV                | 0.1717     | 0.9642      | 0.2887      | 0.6264379 |
+| LOOCV (Tuned)        | 0.1995     | 0.9768      | 0.1004      | 0.5386181 |
+| Repeated CV          | 0.1776     | 0.9104      | 0.4728      | 0.6916177 |
+| Repeated CV (Tuned)  | 0.1120     | 0.9547      | 0.6234      | 0.7890601 |
+
+
+```{r echo=FALSE}
+remove(knn_model, df,
+       knn.kfoldCV.plot,
+       knn.kfoldCV_mod.plot,
+       knn.holdoutCV.plot,
+       knn.holdoutCV_mod.plot,
+       knn.looCV.plot,
+       knn.looCV_mod.plot,
+       knn.repeatedCV.plot,
+       knn.repeatedCV_mod.plot)
+remove(pred_obj, roc_obj)
+remove(auc_val, knn.predictions)
+```
+
 
 ## Logistic Regression
+```{r}
+set.seed(1234)
+
+#----Model Construction----#
+
+```
 
 
 ## Linear Discriminant Analysis
+```{r}
+set.seed(1234)
+
+#----Model Construction----#
+
+```
 
 
 ## Quadratic discriminant analysis
+```{r}
+set.seed(1234)
+
+#----Model Construction----#
+
+```
 
