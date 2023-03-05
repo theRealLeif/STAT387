@@ -24,7 +24,7 @@ format:
       source: true
       toggle: true
       caption: none
-    code-summary: "Show the code"
+    code-summary: "Show/Hide Code"
     highlight-style: atom-one
     link-external-filter: '^(?:http:|https:)\/\/www\.quarto\.org\/custom'
     self-contained-math: true

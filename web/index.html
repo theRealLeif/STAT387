@@ -440,7 +440,7 @@ background-repeat: no-repeat;
 <h3 class="anchored" data-anchor-id="data-import">Data Import</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>wine.data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">winequality-white.csv"</span>, <span class="at">sep=</span><span class="st">";"</span>, <span class="at">header =</span> T)</span>
 <span id="cb1-2"><a href="#cb1-2"></a></span>
 <span id="cb1-3"><a href="#cb1-3"></a>wine.data <span class="ot">&lt;-</span>  wine.data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">good =</span> <span class="fu">ifelse</span>(quality<span class="sc">&gt;=</span><span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
@@ -461,14 +461,14 @@ background-repeat: no-repeat;
 <h3 class="anchored" data-anchor-id="data-analysis">Data Analysis</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">dim</span>(wine.data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 4898   13</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Removing duplicate Rows</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a>wine.data <span class="ot">&lt;-</span> wine.data[<span class="sc">!</span><span class="fu">duplicated</span>(wine.data), ]</span>
 <span id="cb4-3"><a href="#cb4-3"></a></span>
@@ -478,7 +478,7 @@ background-repeat: no-repeat;
 <pre><code>[1] 3961   13</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">str</span>(wine.data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
@@ -498,7 +498,7 @@ background-repeat: no-repeat;
  $ good                : num  0 0 0 0 0 0 0 0 0 1 ...</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">summary</span>(wine.data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
@@ -532,7 +532,7 @@ background-repeat: no-repeat;
  Max.   :1.0000  </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Check for NAs in dataset</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(wine.data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -540,7 +540,7 @@ background-repeat: no-repeat;
 <pre><code>[1] 0</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># Counts at each combination of response's factor levels</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a><span class="fu">table</span>(wine.data<span class="sc">$</span>quality)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -555,7 +555,7 @@ background-repeat: no-repeat;
 <h3 class="anchored" data-anchor-id="data-histograms">Data Histograms</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>wine.colnames <span class="ot">&lt;-</span> <span class="fu">colnames</span>(wine.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>])</span>
 <span id="cb14-2"><a href="#cb14-2"></a>num_plots     <span class="ot">&lt;-</span> <span class="fu">length</span>(wine.colnames)</span>
 <span id="cb14-3"><a href="#cb14-3"></a>num_rows      <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(num_plots<span class="sc">/</span><span class="dv">3</span>)</span>
@@ -592,7 +592,7 @@ background-repeat: no-repeat;
 <h3 class="anchored" data-anchor-id="data-relationships">Data Relationships</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>reshape2<span class="sc">::</span><span class="fu">melt</span>(wine.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>], <span class="st">"quality"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb15-2"><a href="#cb15-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(value, quality, <span class="at">color =</span> variable)) <span class="sc">+</span>  </span>
 <span id="cb15-3"><a href="#cb15-3"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
@@ -603,7 +603,7 @@ background-repeat: no-repeat;
 <p><img src="index_files/figure-html/relation_plot-1.png" class="img-fluid" width="960"></p>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># Collinearity between Attributes</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a><span class="fu">cor</span>(wine.data) <span class="sc">%&gt;%</span> </span>
 <span id="cb16-3"><a href="#cb16-3"></a>  corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="at">method =</span> <span class="st">'number'</span>,  <span class="at">type =</span> <span class="st">"lower"</span>, <span class="at">tl.col =</span> <span class="st">"steelblue"</span>, <span class="at">number.cex =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -612,7 +612,7 @@ background-repeat: no-repeat;
 <p><img src="index_files/figure-html/relation_plot-2.png" class="img-fluid" width="960"></p>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Remove quality from dataset, use good as response </span></span>
 <span id="cb17-2"><a href="#cb17-2"></a>wine.data<span class="sc">$</span>quality <span class="ot">&lt;-</span> <span class="cn">NULL</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -622,7 +622,7 @@ background-repeat: no-repeat;
 <h3 class="anchored" data-anchor-id="data-split">Data Split</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Splitting the dataset into train and test (7/10th for train remaining for test)</span></span>
 <span id="cb18-2"><a href="#cb18-2"></a>inTrain <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">createDataPartition</span>(wine.data<span class="sc">$</span>good, <span class="at">p =</span> <span class="dv">7</span><span class="sc">/</span><span class="dv">10</span>, <span class="at">list =</span> F)</span>
 <span id="cb18-3"><a href="#cb18-3"></a>train <span class="ot">&lt;-</span> wine.data[inTrain,]</span>
@@ -642,7 +642,7 @@ background-repeat: no-repeat;
 <h3 class="anchored" data-anchor-id="model-construction">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co">#--------------------#</span></span>
 <span id="cb19-2"><a href="#cb19-2"></a><span class="co">#-----K-fold CV------#</span></span>
 <span id="cb19-3"><a href="#cb19-3"></a><span class="co">#--------------------#</span></span>
@@ -788,7 +788,7 @@ background-repeat: no-repeat;
 <h3 class="anchored" data-anchor-id="k-fold-cv">K-fold CV</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Import model</span></span>
 <span id="cb20-2"><a href="#cb20-2"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_kfoldCV.Rdata"</span>)</span>
 <span id="cb20-3"><a href="#cb20-3"></a></span>
@@ -827,7 +827,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="co"># Convert predictions to a numeric vector</span></span>
 <span id="cb22-2"><a href="#cb22-2"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb22-3"><a href="#cb22-3"></a></span>
@@ -840,7 +840,7 @@ Prediction   0   1
 <pre><code>[1] 0.5541001</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># Performance plot for TP and FP</span></span>
 <span id="cb24-2"><a href="#cb24-2"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb24-3"><a href="#cb24-3"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
@@ -853,7 +853,7 @@ Prediction   0   1
 <span id="cb24-10"><a href="#cb24-10"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>knn.kfoldCV.ROC.plot<span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb25-2"><a href="#cb25-2"></a></span>
 <span id="cb25-3"><a href="#cb25-3"></a><span class="co"># Accuracy and Kappa value plot</span></span>
@@ -889,7 +889,7 @@ Prediction   0   1
 <h4 class="anchored" data-anchor-id="tuned">Tuned</h4>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_kfoldCV_mod.Rdata"</span>)</span>
 <span id="cb26-2"><a href="#cb26-2"></a></span>
 <span id="cb26-3"><a href="#cb26-3"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_model, <span class="at">newdata =</span> test)</span>
@@ -926,7 +926,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb28-2"><a href="#cb28-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(knn.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb28-3"><a href="#cb28-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -936,7 +936,7 @@ Prediction   0   1
 <pre><code>[1] 0.5386181</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb30-2"><a href="#cb30-2"></a><span class="fu">invisible</span>(<span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb30-3"><a href="#cb30-3"></a>               <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -948,7 +948,7 @@ Prediction   0   1
 <span id="cb30-9"><a href="#cb30-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>knn.kfoldCV_mod.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb31-2"><a href="#cb31-2"></a></span>
 <span id="cb31-3"><a href="#cb31-3"></a>knn.kfoldCV_mod.plot <span class="ot">&lt;-</span> <span class="fu">knn.accu.kappa.plot</span>(knn_model) <span class="sc">+</span></span>
@@ -963,7 +963,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="hold-out-cv-validation-set-approach">Hold-out CV (Validation Set Approach)</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_holdoutCV.Rdata"</span>)</span>
 <span id="cb32-2"><a href="#cb32-2"></a></span>
 <span id="cb32-3"><a href="#cb32-3"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_model, <span class="at">newdata =</span> test)</span>
@@ -1000,7 +1000,7 @@ Prediction   0   1
                                          </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb34-2"><a href="#cb34-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(knn.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb34-3"><a href="#cb34-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1010,7 +1010,7 @@ Prediction   0   1
 <pre><code>[1] 0.5463051</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb36-2"><a href="#cb36-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb36-3"><a href="#cb36-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1022,7 +1022,7 @@ Prediction   0   1
 <span id="cb36-9"><a href="#cb36-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>knn.holdoutCV.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb37-2"><a href="#cb37-2"></a></span>
 <span id="cb37-3"><a href="#cb37-3"></a>knn.holdoutCV.plot <span class="ot">&lt;-</span> <span class="fu">knn.accu.kappa.plot</span>(knn_model) <span class="sc">+</span></span>
@@ -1035,7 +1035,7 @@ Prediction   0   1
 <h4 class="anchored" data-anchor-id="tuned-1">Tuned</h4>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_holdoutCV_mod.Rdata"</span>)</span>
 <span id="cb38-2"><a href="#cb38-2"></a></span>
 <span id="cb38-3"><a href="#cb38-3"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_model, <span class="at">newdata =</span> test)</span>
@@ -1072,7 +1072,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb40-2"><a href="#cb40-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(knn.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb40-3"><a href="#cb40-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1082,7 +1082,7 @@ Prediction   0   1
 <pre><code>[1] 0.5067722</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb42-2"><a href="#cb42-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb42-3"><a href="#cb42-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1094,7 +1094,7 @@ Prediction   0   1
 <span id="cb42-9"><a href="#cb42-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>knn.holdoutCV_mod.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb43-2"><a href="#cb43-2"></a></span>
 <span id="cb43-3"><a href="#cb43-3"></a>knn.holdoutCV_mod.plot <span class="ot">&lt;-</span> <span class="fu">knn.accu.kappa.plot</span>(knn_model) <span class="sc">+</span> </span>
@@ -1109,7 +1109,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="loocv">LOOCV</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_looCV.Rdata"</span>)</span>
 <span id="cb44-2"><a href="#cb44-2"></a></span>
 <span id="cb44-3"><a href="#cb44-3"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_model, <span class="at">newdata =</span> test)</span>
@@ -1145,7 +1145,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb46-2"><a href="#cb46-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(knn.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb46-3"><a href="#cb46-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1155,7 +1155,7 @@ Prediction   0   1
 <pre><code>[1] 0.6264379</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb48-2"><a href="#cb48-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb48-3"><a href="#cb48-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1167,7 +1167,7 @@ Prediction   0   1
 <span id="cb48-9"><a href="#cb48-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a>knn.looCV.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb49-2"><a href="#cb49-2"></a></span>
 <span id="cb49-3"><a href="#cb49-3"></a>knn.looCV.plot <span class="ot">&lt;-</span> <span class="fu">knn.accu.kappa.plot</span>(knn_model) <span class="sc">+</span> </span>
@@ -1180,7 +1180,7 @@ Prediction   0   1
 <h4 class="anchored" data-anchor-id="tuned-2">Tuned</h4>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_looCV_mod.Rdata"</span>)</span>
 <span id="cb50-2"><a href="#cb50-2"></a></span>
 <span id="cb50-3"><a href="#cb50-3"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_model, <span class="at">newdata =</span> test)</span>
@@ -1216,7 +1216,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb52-2"><a href="#cb52-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(knn.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb52-3"><a href="#cb52-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1226,7 +1226,7 @@ Prediction   0   1
 <pre><code>[1] 0.5386181</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb54-2"><a href="#cb54-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb54-3"><a href="#cb54-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1238,7 +1238,7 @@ Prediction   0   1
 <span id="cb54-9"><a href="#cb54-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a>knn.looCV_mod.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb55-2"><a href="#cb55-2"></a></span>
 <span id="cb55-3"><a href="#cb55-3"></a>knn.looCV_mod.plot <span class="ot">&lt;-</span> <span class="fu">knn.accu.kappa.plot</span>(knn_model) <span class="sc">+</span> </span>
@@ -1253,7 +1253,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="repeated-cv">Repeated CV</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_repeatedCV.Rdata"</span>)</span>
 <span id="cb56-2"><a href="#cb56-2"></a></span>
 <span id="cb56-3"><a href="#cb56-3"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_model, <span class="at">newdata =</span> test)</span>
@@ -1290,7 +1290,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb58-2"><a href="#cb58-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(knn.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb58-3"><a href="#cb58-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1300,7 +1300,7 @@ Prediction   0   1
 <pre><code>[1] 0.6916177</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb60-2"><a href="#cb60-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb60-3"><a href="#cb60-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1312,7 +1312,7 @@ Prediction   0   1
 <span id="cb60-9"><a href="#cb60-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a>knn.repeatedCV.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb61-2"><a href="#cb61-2"></a></span>
 <span id="cb61-3"><a href="#cb61-3"></a>df <span class="ot">&lt;-</span> knn_model<span class="sc">$</span>results</span>
@@ -1341,7 +1341,7 @@ Prediction   0   1
 <h4 class="anchored" data-anchor-id="tuned-3">Tuned</h4>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">knn.model_repeatedCV_mod.Rdata"</span>)</span>
 <span id="cb62-2"><a href="#cb62-2"></a></span>
 <span id="cb62-3"><a href="#cb62-3"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(knn_model, <span class="at">newdata =</span> test)</span>
@@ -1378,7 +1378,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a>knn.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(knn.predictions)</span>
 <span id="cb64-2"><a href="#cb64-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(knn.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb64-3"><a href="#cb64-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1388,7 +1388,7 @@ Prediction   0   1
 <pre><code>[1] 0.7890601</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb66-2"><a href="#cb66-2"></a></span>
 <span id="cb66-3"><a href="#cb66-3"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
@@ -1401,7 +1401,7 @@ Prediction   0   1
 <span id="cb66-10"><a href="#cb66-10"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1"></a>knn.repeatedCV_mod.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span>
 <span id="cb67-2"><a href="#cb67-2"></a></span>
 <span id="cb67-3"><a href="#cb67-3"></a>knn.repeatedCV_mod.plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(knn_model) <span class="sc">+</span></span>
@@ -1418,7 +1418,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="summary">Summary</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1"></a><span class="fu">ggarrange</span>(knn.kfoldCV.plot,</span>
 <span id="cb68-2"><a href="#cb68-2"></a>          knn.kfoldCV_mod.plot,</span>
 <span id="cb68-3"><a href="#cb68-3"></a>          knn.holdoutCV.plot,</span>
@@ -1435,7 +1435,7 @@ Prediction   0   1
 </div>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1"></a>cowplot<span class="sc">::</span><span class="fu">plot_grid</span>(knn.kfoldCV.ROC.plot, knn.kfoldCV_mod.ROC.plot,</span>
 <span id="cb69-2"><a href="#cb69-2"></a>                   <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">align =</span> <span class="st">"hv"</span>, <span class="at">scale =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1443,7 +1443,7 @@ Prediction   0   1
 <p><img src="index_files/figure-html/knn.ROC_curve-1.png" class="img-fluid" width="960"></p>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1"></a>cowplot<span class="sc">::</span><span class="fu">plot_grid</span>(knn.holdoutCV.ROC.plot, knn.holdoutCV_mod.ROC.plot,</span>
 <span id="cb70-2"><a href="#cb70-2"></a>                   <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">align =</span> <span class="st">"hv"</span>, <span class="at">scale =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1451,7 +1451,7 @@ Prediction   0   1
 <p><img src="index_files/figure-html/knn.ROC_curve-2.png" class="img-fluid" width="960"></p>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1"></a>cowplot<span class="sc">::</span><span class="fu">plot_grid</span>(knn.looCV.ROC.plot, knn.looCV_mod.ROC.plot,</span>
 <span id="cb71-2"><a href="#cb71-2"></a>                   <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">align =</span> <span class="st">"hv"</span>, <span class="at">scale =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1459,7 +1459,7 @@ Prediction   0   1
 <p><img src="index_files/figure-html/knn.ROC_curve-3.png" class="img-fluid" width="960"></p>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1"></a>cowplot<span class="sc">::</span><span class="fu">plot_grid</span>(knn.repeatedCV.ROC.plot, knn.repeatedCV_mod.ROC.plot,</span>
 <span id="cb72-2"><a href="#cb72-2"></a>                   <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">align =</span> <span class="st">"hv"</span>, <span class="at">scale =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1554,7 +1554,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-1">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1"></a><span class="co">#----------------------------#</span></span>
 <span id="cb73-2"><a href="#cb73-2"></a><span class="co">#----Logistic Regression-----#</span></span>
 <span id="cb73-3"><a href="#cb73-3"></a><span class="co">#----------------------------#</span></span>
@@ -1584,7 +1584,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="k-fold-cv-1">K-fold CV</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">logit.model_kfoldCV.Rdata"</span>)</span>
 <span id="cb74-2"><a href="#cb74-2"></a></span>
 <span id="cb74-3"><a href="#cb74-3"></a>logit.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(logit_model, <span class="at">newdata =</span> test)</span>
@@ -1621,7 +1621,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1"></a>logit.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(logit.predictions)</span>
 <span id="cb76-2"><a href="#cb76-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(logit.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb76-3"><a href="#cb76-3"></a>auc_val  <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1631,7 +1631,7 @@ Prediction   0   1
 <pre><code>[1] 0.6137776</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb78-2"><a href="#cb78-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb78-3"><a href="#cb78-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1643,7 +1643,7 @@ Prediction   0   1
 <span id="cb78-9"><a href="#cb78-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1"></a>logit.kfoldCV.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -1651,7 +1651,7 @@ Prediction   0   1
 <h4 class="anchored" data-anchor-id="tuned-4">Tuned</h4>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1"></a>glm.model <span class="ot">&lt;-</span> <span class="fu">glm</span>(good <span class="sc">~</span> ., <span class="at">data=</span> train,<span class="at">family=</span><span class="st">"binomial"</span>)</span>
 <span id="cb80-2"><a href="#cb80-2"></a>glm.fit<span class="ot">=</span> <span class="fu">stepAIC</span>(glm.model, <span class="at">direction =</span> <span class="st">'backward'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1726,7 +1726,7 @@ good ~ fixed.acidity + volatile.acidity + residual.sugar + chlorides +
 - density              1   2560.1 2576.1</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1"></a><span class="co"># Make predictions on test data and construct a confusion matrix</span></span>
 <span id="cb82-2"><a href="#cb82-2"></a>logit.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(glm.fit, <span class="at">newdata =</span> test,<span class="at">type =</span> <span class="st">"response"</span>)</span>
 <span id="cb82-3"><a href="#cb82-3"></a>logit.predictions <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">ifelse</span>(logit.predictions <span class="sc">&gt;</span> <span class="fl">0.7</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
@@ -1763,7 +1763,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1"></a>logit.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(logit.predictions)</span>
 <span id="cb84-2"><a href="#cb84-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(logit.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb84-3"><a href="#cb84-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1773,7 +1773,7 @@ Prediction   0   1
 <pre><code>[1] 0.5386644</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb86-2"><a href="#cb86-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb86-3"><a href="#cb86-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1788,7 +1788,7 @@ Prediction   0   1
 <p><img src="index_files/figure-html/logit.kfoldCV_mod-1.png" class="img-fluid" width="672"></p>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1"></a>logit.kfoldCV.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -1835,7 +1835,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-2">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1"></a><span class="co">#------------#</span></span>
 <span id="cb88-2"><a href="#cb88-2"></a><span class="co">#----LDA-----#</span></span>
 <span id="cb88-3"><a href="#cb88-3"></a><span class="co">#------------#</span></span>
@@ -1861,7 +1861,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="k-fold-cv-2">K-fold CV</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">lda.model_kfoldCV.Rdata"</span>)</span>
 <span id="cb89-2"><a href="#cb89-2"></a></span>
 <span id="cb89-3"><a href="#cb89-3"></a>lda.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(lda_model, <span class="at">newdata =</span> test)</span>
@@ -1898,7 +1898,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1"></a>lda.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(lda.predictions)</span>
 <span id="cb91-2"><a href="#cb91-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(lda.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb91-3"><a href="#cb91-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -1908,7 +1908,7 @@ Prediction   0   1
 <pre><code>[1] 0.6294448</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb93-2"><a href="#cb93-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb93-3"><a href="#cb93-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -1920,7 +1920,7 @@ Prediction   0   1
 <span id="cb93-9"><a href="#cb93-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1"></a>lda.kfoldCV.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -1972,7 +1972,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-3">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1"></a><span class="co">#------------#</span></span>
 <span id="cb95-2"><a href="#cb95-2"></a><span class="co">#----QDA-----#</span></span>
 <span id="cb95-3"><a href="#cb95-3"></a><span class="co">#------------#</span></span>
@@ -1997,7 +1997,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="k-fold-cv-3">K-fold CV</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1"></a><span class="fu">load</span>(<span class="st">"dataset</span><span class="sc">\\</span><span class="st">qda.model_kfoldCV.Rdata"</span>)</span>
 <span id="cb96-2"><a href="#cb96-2"></a></span>
 <span id="cb96-3"><a href="#cb96-3"></a>qda.predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(qda_model, <span class="at">newdata =</span> test)</span>
@@ -2034,7 +2034,7 @@ Prediction   0   1
                                           </code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1"></a>qda.predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(qda.predictions)</span>
 <span id="cb98-2"><a href="#cb98-2"></a>pred_obj <span class="ot">&lt;-</span> <span class="fu">prediction</span>(qda.predictions, test<span class="sc">$</span>good)</span>
 <span id="cb98-3"><a href="#cb98-3"></a>auc_val <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"auc"</span>)<span class="sc">@</span>y.values[[<span class="dv">1</span>]]</span>
@@ -2044,7 +2044,7 @@ Prediction   0   1
 <pre><code>[1] 0.7474858</code></pre>
 </div>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1"></a>roc_obj <span class="ot">&lt;-</span> <span class="fu">performance</span>(pred_obj, <span class="st">"tpr"</span>, <span class="st">"fpr"</span>)</span>
 <span id="cb100-2"><a href="#cb100-2"></a><span class="fu">plot</span>(roc_obj, <span class="at">colorize =</span> <span class="cn">TRUE</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
 <span id="cb100-3"><a href="#cb100-3"></a>     <span class="at">xlab =</span> <span class="st">"False Positive Rate"</span>, </span>
@@ -2056,7 +2056,7 @@ Prediction   0   1
 <span id="cb100-9"><a href="#cb100-9"></a><span class="fu">abline</span>(<span class="at">a =</span> <span class="dv">0</span>, <span class="at">b =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb101"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1"></a>qda.kfoldCV.ROC.plot <span class="ot">&lt;-</span> <span class="fu">recordPlot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2104,7 +2104,7 @@ Prediction   0   1
 <h2 class="anchored" data-anchor-id="summary-1">Summary</h2>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb103"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1"></a>cowplot<span class="sc">::</span><span class="fu">plot_grid</span>(knn.kfoldCV.ROC.plot,</span>
 <span id="cb103-2"><a href="#cb103-2"></a>                   logit.kfoldCV.ROC.plot,</span>
 <span id="cb103-3"><a href="#cb103-3"></a>                   lda.kfoldCV.ROC.plot,</span>
@@ -2198,7 +2198,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-4">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb104"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2222,7 +2222,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-5">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2246,7 +2246,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-6">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb106"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2270,7 +2270,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-7">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb107"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2294,7 +2294,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-8">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb108"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2318,7 +2318,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-9">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb109"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2342,7 +2342,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-10">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb110"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2366,7 +2366,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-11">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb111"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2390,7 +2390,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-12">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb112"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2414,7 +2414,7 @@ Prediction   0   1
 <h3 class="anchored" data-anchor-id="model-construction-13">Model Construction</h3>
 <div class="cell">
 <details>
-<summary>Show the code</summary>
+<summary>Show/Hide Code</summary>
 <div class="sourceCode cell-code" id="cb113"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -2725,7 +2725,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb114-24"><a href="#cb114-24"></a><span class="co">      source: true</span></span>
 <span id="cb114-25"><a href="#cb114-25"></a><span class="co">      toggle: true</span></span>
 <span id="cb114-26"><a href="#cb114-26"></a><span class="co">      caption: none</span></span>
-<span id="cb114-27"><a href="#cb114-27"></a><span class="co">    code-summary: "Show the code"</span></span>
+<span id="cb114-27"><a href="#cb114-27"></a><span class="co">    code-summary: "Show/Hide Code"</span></span>
 <span id="cb114-28"><a href="#cb114-28"></a><span class="co">    highlight-style: atom-one</span></span>
 <span id="cb114-29"><a href="#cb114-29"></a><span class="co">    link-external-filter: '^(?:http:|https:)\/\/www\.quarto\.org\/custom'</span></span>
 <span id="cb114-30"><a href="#cb114-30"></a><span class="co">    self-contained-math: true</span></span>
