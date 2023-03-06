@@ -18,6 +18,8 @@ winequal$good[winequal$quality < 7] <- 0
 winequal$good[winequal$quality >= 7] <- 1
 winequal$quality <- NULL
 winequal <- distinct(winequal)
+
+ winequal$good <- cut(winequal$good, breaks = c(-1, 0, 1), labels = c("Not Good", "Good"))
 ```
 
 ```{r}
@@ -30,39 +32,43 @@ test <- winequal[-inTrain,]
 
 log.reg = glm(good ~ ., family = binomial, data = train)
 
-log.probs = predict(log.reg, winequal, type = "response")
 
-winequal$good <- cut(winequal$good, breaks = c(-1, 0, 1), labels = c("Not Good", "Good"))
+ log.probs = predict(log.reg, train, type = "response")
+ length(log.probs)
+ 
+ 
 contrasts(winequal$good)
 
-log.pred = rep("Not Good",980)
-log.pred[log.probs == 1] = "Good"
-#tail(log.pred)
-table(winequal$good, log.pred)
+ log.pred = rep("Not Good",2774)
+ log.pred[log.probs > 0.5] = "Good"
 
+ table(train$good, log.pred)
 
-log.tn = sum((winequal$good == unique(winequal$good)[1])&(log.pred == unique(winequal$good)[1]))
-log.tp = sum((winequal$good == unique(winequal$good)[2])&(log.pred == unique(winequal$good)[2]))
+ 
+ log.tn = sum((train$good == unique(train$good)[1])&(log.pred == unique(train$good)[1]))
+ log.tp = sum((train$good == unique(train$good)[2])&(log.pred == unique(train$good)[2]))
 
-log.fp = sum((winequal$good == unique(winequal$good)[1])&(log.pred == unique(winequal$good)[2]))
-log.fn = sum((winequal$good == unique(winequal$good)[2])&(log.pred == unique(winequal$good)[1]))
+  log.fp = sum((train$good == unique(train$good)[1])&(log.pred == unique(train$good)[2]))
+ log.fn = sum((train$good == unique(train$good)[2])&(log.pred == unique(train$good)[1]))
 
-log.n = log.tn + log.fp
-log.p = log.fn + log.tp
-
-#Specificity
-spec.log  = 1 - (log.fp/log.n)
-
-#Sensitivity
-sen.log   = log.tp/log.p
-
-#Error
+ log.n = log.tn + log.fp
+ log.p = log.fn + log.tp
+ 
+# #Specificity
+ spec.log  = 1 - (log.fp/log.n)
+ 
+# #Sensitivity
+ sen.log   = log.tp/log.p
+ 
+ #Error
 oer.log1  = (log.fn + log.fp)/(log.n + log.p)
 #oer.log2  = 1 - mean(log.pred == Direction.2005)
 
-#AUC
-log.pred <- prediction(log.probs, winequal$good) 
+# #AUC
+log.pred <- prediction(log.probs, train$good)
 log.perf <- performance(log.pred,"tpr","fpr")
 plot(log.perf,colorize=TRUE, lwd = 2)
-abline(a = 0, b = 1) 
+abline(a = 0, b = 1)
 log.auc = performance(log.pred, measure = "auc")
+print(log.auc@y.values)
+```
