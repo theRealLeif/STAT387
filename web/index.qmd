@@ -35,6 +35,8 @@ format:
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = TRUE)
+
 library(tidyverse)  # Load core packages: 
 # ggplot2,   for data visualization.
 # dplyr,     for data manipulation.
@@ -562,7 +564,7 @@ roc_obj <- performance(pred_obj, "tpr", "fpr")
 invisible(plot(roc_obj, colorize = TRUE, lwd = 2,
                xlab = "False Positive Rate", 
                ylab = "True Positive Rate",
-               main = "ROC Curves from Tuned K-fold CV"))
+               main = "ROC Curves from Tuned 10-fold CV"))
 points(auc_val, 1 - auc_val, 
        col = "steelblue", 
        pch = 21)
@@ -1065,26 +1067,6 @@ cowplot::plot_grid(knn.kfoldCV.ROC.plot,
 | QDA (Tuned)                 | 0.xxxx     | 0.xxxx      | 0.xxxx      | 0.xxxxxxx |
 
 
-## Multi Regression
-
-### Model Construction
-```{r}
-set.seed(1234)
-
-
-```
-
-### K-fold CV
-```{r}
-
-```
-
-#### Tuned
-```{r}
-
-```
-
-
 ## Naive Bayes
 
 ### Model Construction
@@ -1105,7 +1087,7 @@ set.seed(1234)
 ```
 
 
-## Decision Forest
+## Decision Tree
 
 ### Model Construction
 ```{r}
@@ -1125,67 +1107,7 @@ set.seed(1234)
 ```
 
 
-## Classification Tree
-
-### Model Construction
-```{r}
-set.seed(1234)
-
-
-```
-
-### K-fold CV
-```{r}
-
-```
-
-#### Tuned
-```{r}
-
-```
-
-
-## Regression Tree
-
-### Model Construction
-```{r}
-set.seed(1234)
-
-
-```
-
-### K-fold CV
-```{r}
-
-```
-
-#### Tuned
-```{r}
-
-```
-
-
-## Randome Forest - Classification
-
-### Model Construction
-```{r}
-set.seed(1234)
-
-
-```
-
-### K-fold CV
-```{r}
-
-```
-
-#### Tuned
-```{r}
-
-```
-
-
-## Randome Forest - Regression
+## Randome Forest
 
 ### Model Construction
 ```{r}
