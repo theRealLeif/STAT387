@@ -11,7 +11,7 @@
 
 <meta name="author" content="Leif Watkins" />
 
-<meta name="date" content="2023-03-02" />
+<meta name="date" content="2023-03-07" />
 
 <title>Untitled</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Untitled</h1>
 <h4 class="author">Leif Watkins</h4>
-<h4 class="date">2023-03-02</h4>
+<h4 class="date">2023-03-07</h4>
 
 </div>
 
@@ -403,7 +403,11 @@ head(wine_data)</code></pre>
 #splitting the dataset into train and test (2/3rd for train remaining for test)
 inTrain &lt;- caret::createDataPartition(wine_data$good, p = 7/10, list = F)
 train &lt;- wine_data[inTrain,]
-test &lt;- wine_data[-inTrain,]</code></pre>
+test &lt;- wine_data[-inTrain,]
+
+
+train$good &lt;- as.factor(train$good)
+test$good &lt;- as.factor(test$good)</code></pre>
 <div id="fitting-a-logistic-regression" class="section level1">
 <h1>fitting a logistic regression</h1>
 <pre class="r"><code>#wine_glm&lt;- glm(good ~ . ,wine_data)
@@ -415,61 +419,97 @@ test &lt;- wine_data[-inTrain,]</code></pre>
 #summary(w2_glm)</code></pre>
 <div id="qda" class="section level3">
 <h3>qda</h3>
-<pre class="r"><code>qda.fit = qda(good ~ . , data = train, family = binomial)
+<pre class="r"><code>### THE OLD WAY OF DOING IT
+set.seed(1234)
+qda.fit = qda(good ~ . , data = train, family = binomial)
 qda.fit</code></pre>
 <pre><code>## Call:
 ## qda(good ~ ., data = train, family = binomial)
 ## 
 ## Prior probabilities of groups:
-##        0        1 
-## 0.787234 0.212766 
+##         0         1 
+## 0.7886765 0.2113235 
 ## 
 ## Group means:
 ##   fixed.acidity volatile.acidity citric.acid residual.sugar  chlorides
-## 0      6.871942        0.2843037   0.3347458       6.395831 0.04788227
-## 1      6.681780        0.2696102   0.3337627       4.792034 0.03775424
+## 0      6.887517        0.2847485   0.3389712       6.374714 0.04819753
+## 1      6.681399        0.2686177   0.3280717       4.678584 0.03736860
 ##   free.sulfur.dioxide total.sulfur.dioxide   density       pH sulphates
-## 0            35.25401             142.2629 0.9943180 3.188268 0.4908795
-## 1            34.68729             123.5008 0.9920778 3.231983 0.4979322
+## 0            35.31161             141.3880 0.9943120 3.184682 0.4862643
+## 1            33.67747             120.7901 0.9920071 3.228515 0.4982594
 ##    alcohol
-## 0 10.32583
-## 1 11.58117</code></pre>
-<pre class="r"><code>qda.pred  = predict(qda.fit, train)
+## 0 10.32185
+## 1 11.58576</code></pre>
+<pre class="r"><code># 
+# 
+set.seed(1234)
+qda.pred  = predict(qda.fit, test)
 names(qda.pred)</code></pre>
 <pre><code>## [1] &quot;class&quot;     &quot;posterior&quot;</code></pre>
 <pre class="r"><code>qda.class = qda.pred$class
 length(test$good)</code></pre>
 <pre><code>## [1] 1188</code></pre>
 <pre class="r"><code>length(qda.class)</code></pre>
-<pre><code>## [1] 2773</code></pre>
-<pre class="r"><code>#      truth   , prediction  
-table(train$good, qda.class )</code></pre>
+<pre><code>## [1] 1188</code></pre>
+<pre class="r"><code>#      truth   , prediction
+#table(qda.class, test$good )
+table(test$good, qda.class )</code></pre>
 <pre><code>##    qda.class
-##        0    1
-##   0 1632  551
-##   1  156  434</code></pre>
-<pre class="r"><code># 
-# 
-# qda.tn = sum((Direction.2005 == unique(Direction.2005)[1])&amp;(qda.class == unique(Direction.2005)[1]))
-# qda.tp = sum((Direction.2005 == unique(Direction.2005)[2])&amp;(qda.class == unique(Direction.2005)[2]))
-# 
-# qda.fp = sum((Direction.2005 == unique(Direction.2005)[1])&amp;(qda.class == unique(Direction.2005)[2]))
-# qda.fn = sum((Direction.2005 == unique(Direction.2005)[2])&amp;(qda.class == unique(Direction.2005)[1]))
-# 
-# qda.n = qda.tn + qda.fp
-# qda.p = qda.fn + qda.tp
-# 
-# 
-# 
-# # Specificity, Sensitivity, Overall Error/ Probability of Misclassification #
-# spec.qda  = 1 - (qda.fp/qda.n)
-# sen.qda   = qda.tp/qda.p
-# oer.qda1  = (qda.fn + qda.fp)/(qda.n + qda.p)
-# #oer.qda2  = 1 - mean(qda.class == Direction.2005)
-# 
-# 
-# 
-# # ROCR #
+##       0   1
+##   0 704 245
+##   1  59 180</code></pre>
+<pre class="r"><code>#caret::confusionMatrix(qda.class, test$good )
+
+#### using caret package
+library(caret)</code></pre>
+<pre><code>## Warning: package &#39;caret&#39; was built under R version 4.2.2</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lattice&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:boot&#39;:
+## 
+##     melanoma</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caret&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     lift</code></pre>
+<pre class="r"><code>set.seed(1234)
+train_qda &lt;- trainControl(method = &quot;cv&quot;, number = 10 )
+set.seed(1234)
+wine_qda &lt;- train(good ~ . , data = train , method = &quot;qda&quot;, trControl = train_qda)
+
+#predictions
+qda_pred &lt;- predict(wine_qda, newdata= test)
+caret::confusionMatrix(test$good ,qda_pred)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 704 245
+##          1  59 180
+##                                           
+##                Accuracy : 0.7441          
+##                  95% CI : (0.7183, 0.7687)
+##     No Information Rate : 0.6423          
+##     P-Value [Acc &gt; NIR] : 3.629e-14       
+##                                           
+##                   Kappa : 0.3834          
+##                                           
+##  Mcnemar&#39;s Test P-Value : &lt; 2.2e-16       
+##                                           
+##             Sensitivity : 0.9227          
+##             Specificity : 0.4235          
+##          Pos Pred Value : 0.7418          
+##          Neg Pred Value : 0.7531          
+##              Prevalence : 0.6423          
+##          Detection Rate : 0.5926          
+##    Detection Prevalence : 0.7988          
+##       Balanced Accuracy : 0.6731          
+##                                           
+##        &#39;Positive&#39; Class : 0               
+## </code></pre>
+<pre class="r"><code># # ROCR #
 # qda.pred &lt;- prediction(qda.pred$posterior[,2], Smarket.2005$Direction) 
 # qda.perf &lt;- performance(qda.pred,&quot;tpr&quot;,&quot;fpr&quot;)
 # plot(qda.perf,colorize=TRUE, lwd = 2)
@@ -483,6 +523,60 @@ table(train$good, qda.class )</code></pre>
 # results.matrix[3,] = as.numeric( c(spec.qda, sen.qda, oer.qda1, qda.auc@y.values))
 # 
 # </code></pre>
+<div id="lda" class="section level4">
+<h4>LDA</h4>
+<pre class="r"><code>###### caret
+# set.seed(1234)
+# train_lda &lt;- trainControl(method = &quot;cv&quot;, repeats = 10 )
+# set.seed(1234)
+# wine_lda &lt;- train(good ~ . , data = train , method = &quot;lda&quot;, trControl = train_lda)
+# 
+# #predictions
+# lda_pred &lt;- predict(wine_lda, newdata= test)
+# caret::confusionMatrix(lda_pred, test$good )
+
+######### base R
+
+
+set.seed(1234)
+lda.fit = qda(good ~ . , data = train, family = binomial)
+lda.fit</code></pre>
+<pre><code>## Call:
+## qda(good ~ ., data = train, family = binomial)
+## 
+## Prior probabilities of groups:
+##         0         1 
+## 0.7886765 0.2113235 
+## 
+## Group means:
+##   fixed.acidity volatile.acidity citric.acid residual.sugar  chlorides
+## 0      6.887517        0.2847485   0.3389712       6.374714 0.04819753
+## 1      6.681399        0.2686177   0.3280717       4.678584 0.03736860
+##   free.sulfur.dioxide total.sulfur.dioxide   density       pH sulphates
+## 0            35.31161             141.3880 0.9943120 3.184682 0.4862643
+## 1            33.67747             120.7901 0.9920071 3.228515 0.4982594
+##    alcohol
+## 0 10.32185
+## 1 11.58576</code></pre>
+<pre class="r"><code># 
+# 
+set.seed(1234)
+lda.pred  = predict(lda.fit, test)
+names(lda.pred)</code></pre>
+<pre><code>## [1] &quot;class&quot;     &quot;posterior&quot;</code></pre>
+<pre class="r"><code>lda.class = lda.pred$class
+length(test$good)</code></pre>
+<pre><code>## [1] 1188</code></pre>
+<pre class="r"><code>length(lda.class)</code></pre>
+<pre><code>## [1] 1188</code></pre>
+<pre class="r"><code>#      truth   , prediction
+#table(qda.class, test$good )
+table(test$good, qda.class )</code></pre>
+<pre><code>##    qda.class
+##       0   1
+##   0 704 245
+##   1  59 180</code></pre>
+</div>
 </div>
 </div>
 

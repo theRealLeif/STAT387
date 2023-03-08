@@ -13,16 +13,17 @@ library(e1071)      # Naive Bayesian Classfier,SVM, GKNN, ICA, LCA
 library(class)      # KNN, SOM, LVQ
 library(ROCR)       # Precision/Recall/Sensitivity/Specificity performance plot 
 library(boot)       # LOOCV, Bootstrap,
+set.seed(1234)
 ```
 
 
 
 #get the white wine data and clean it . 
 ```{r}
-wine_data <- read.csv("data\\winequality-white.csv", sep = ";", header = T)
+data <- read.csv("data\\winequality-white.csv", sep = ";", header = T)
 
 # this is to convert the quality predictor from numerical into categorical
-wine_data <-  wine_data %>% mutate(good = ifelse(quality>=7, 1, 0))
+wine_data <-  data %>% mutate(good = ifelse(quality>=7, 1, 0))
 wine_data$quality <- NULL
 
 wine_data <- wine_data[!duplicated(wine_data), ]
@@ -45,10 +46,8 @@ train <- wine_data[inTrain,]
 test <- wine_data[-inTrain,]
 
 
-
-
-
-
+train$good <- as.factor(train$good)
+test$good <- as.factor(test$good)
 
 ```
 
@@ -71,40 +70,38 @@ test <- wine_data[-inTrain,]
 ### qda 
 ```{r}
 
-
-
+### THE OLD WAY OF DOING IT
+set.seed(1234)
 qda.fit = qda(good ~ . , data = train, family = binomial)
 qda.fit
-
-
-qda.pred  = predict(qda.fit, train)
+# 
+# 
+set.seed(1234)
+qda.pred  = predict(qda.fit, test)
 names(qda.pred)
 qda.class = qda.pred$class
 length(test$good)
 length(qda.class)
-#      truth   , prediction  
-table(train$good, qda.class )
-# 
-# 
-# qda.tn = sum((Direction.2005 == unique(Direction.2005)[1])&(qda.class == unique(Direction.2005)[1]))
-# qda.tp = sum((Direction.2005 == unique(Direction.2005)[2])&(qda.class == unique(Direction.2005)[2]))
-# 
-# qda.fp = sum((Direction.2005 == unique(Direction.2005)[1])&(qda.class == unique(Direction.2005)[2]))
-# qda.fn = sum((Direction.2005 == unique(Direction.2005)[2])&(qda.class == unique(Direction.2005)[1]))
-# 
-# qda.n = qda.tn + qda.fp
-# qda.p = qda.fn + qda.tp
-# 
-# 
-# 
-# # Specificity, Sensitivity, Overall Error/ Probability of Misclassification #
-# spec.qda  = 1 - (qda.fp/qda.n)
-# sen.qda   = qda.tp/qda.p
-# oer.qda1  = (qda.fn + qda.fp)/(qda.n + qda.p)
-# #oer.qda2  = 1 - mean(qda.class == Direction.2005)
-# 
-# 
-# 
+#      truth   , prediction
+#table(qda.class, test$good )
+table(test$good, qda.class )
+
+#caret::confusionMatrix(qda.class, test$good )
+
+#### using caret package
+library(caret)
+
+set.seed(1234)
+train_qda <- trainControl(method = "cv", number = 10 )
+set.seed(1234)
+wine_qda <- train(good ~ . , data = train , method = "qda", trControl = train_qda)
+
+#predictions
+qda_pred <- predict(wine_qda, newdata= test)
+caret::confusionMatrix(test$good ,qda_pred)
+
+
+
 # # ROCR #
 # qda.pred <- prediction(qda.pred$posterior[,2], Smarket.2005$Direction) 
 # qda.perf <- performance(qda.pred,"tpr","fpr")
@@ -119,6 +116,65 @@ table(train$good, qda.class )
 # results.matrix[3,] = as.numeric( c(spec.qda, sen.qda, oer.qda1, qda.auc@y.values))
 # 
 # 
+
+```
+
+
+
+#### LDA  
+```{r}
+###### caret
+# set.seed(1234)
+# train_lda <- trainControl(method = "cv", repeats = 10 )
+# set.seed(1234)
+# wine_lda <- train(good ~ . , data = train , method = "lda", trControl = train_lda)
+# 
+# #predictions
+# lda_pred <- predict(wine_lda, newdata= test)
+# caret::confusionMatrix(lda_pred, test$good )
+
+######### base R
+
+
+
+
+
+
+
+
+
+
+lda.fit = qda(good ~ . , data = train, family = binomial)
+lda.fit
+# 
+# 
+set.seed(1234)
+lda.pred  = predict(lda.fit, test)
+names(lda.pred)
+lda.class = lda.pred$class
+length(test$good)
+length(lda.class)
+#      truth   , prediction
+#table(qda.class, test$good )
+#table(test$good, qda.class )
+
+
+set.seed(1234)
+my_oer <- list()
+
+for (i in 1:10){
+  train_data <- wine_data[-((i*396-395):(i*396)), ]
+  test_data <- wine_data[((i*396-395):(i*396)), ]
+  lda.fit = lda(good ~ . , data = train, family = binomial)
+  m_pred <- predict(lda.fit, test_data)
+  oer  = 1 - mean(lda.fit == test_data)
+  my_oer <- append(oer)
+
+}
+my_oer
+#test_err_rate=c(MAE, mean(mae))
+#MAE
+
 
 ```
 
