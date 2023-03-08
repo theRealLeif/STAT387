@@ -18,7 +18,7 @@ format:
     link-external-icon: false
     link-external-newwindow: false
     code-fold: false
-    code-line-numbers: true
+    code-line-numbers: false
     code-overflow: scroll
     code-tools: 
       source: true
@@ -209,22 +209,17 @@ Use 10-fold cross-validation for estimating the test error rates below and compu
 - GLM/logit/glmnet
 - LDA
 - QDA
-- Regression/Multi-Regression
 - Naive Bayes
 - Decision Tree
-- Classification Tree
-- Regression Tree
-- Classification and Regression Trees (CART)
-- Iterative Dichotomiser 3 (ID3)
-- C4.5
-- Random Forest
-- Classification
-- Regression
-- Bagged
-- Boosted
-- Gradient Boosted Trees (GBT)
+  - Classification and Regression Trees (CART)
+- Random Forest (Classification)
+- Bagging (Bootstrap Aggregation)
+- Boosting (Gradient Boosting Machine (GBM))
+- eXtreme Gradient Boosting (XGBoost)
 - Extremely Randomized Trees (ExtraTrees)
 - SVM
+- Neural Networks (NNET)
+
 
 ### Data Description
 This is a dataset of wine quality containing 4898 observations of 12 variables. The variables are:
@@ -253,22 +248,25 @@ After removing the duplicate rows from our data set, we are left with 3961 obser
 ```{r data_import}
 wine.data <- read.csv("dataset\\winequality-white.csv", sep=";", header = T)
 
-wine.data <-  wine.data %>% mutate(good = ifelse(quality>=7, 1, 0))
+wine.data_subset <-  wine.data %>% 
+  mutate(good = ifelse(quality>=7, 1, 0)) %>% 
+  distinct() %>% 
+  dplyr::select(c(1:11, 13))
 
 head(wine.data)
+head(wine.data_subset)
 ```
 
 ### Data Analysis
 ```{r basic_analysis}
 dim(wine.data)
-
-# Removing duplicate Rows
-wine.data <- wine.data[!duplicated(wine.data), ]
-
-dim(wine.data)
+dim(wine.data_subset)
 
 str(wine.data)
+str(wine.data_subset)
+
 summary(wine.data)
+summary(wine.data_subset)
 
 # Check for NAs in dataset
 sum(is.na(wine.data))
@@ -279,7 +277,7 @@ table(wine.data$quality)
 
 ### Data Histograms
 ```{r hist_plot, warning=FALSE}
-wine.colnames <- colnames(wine.data[, 1:12])
+wine.colnames <- colnames(wine.data_subset[, 1:12])
 num_plots     <- length(wine.colnames)
 num_rows      <- ceiling(num_plots/3)
 
@@ -291,8 +289,8 @@ grid_arr      <- list()
 # Loop over each column name in the wine.colnames vector
 for(i in 1:num_plots) {
   # Create a ggplot object for the current column using aes
-  plt <- ggplot(data = wine.data, aes_string(x = wine.colnames[i])) +
-    geom_histogram(binwidth = diff(range(wine.data[[wine.colnames[i]]]))/30, 
+  plt <- ggplot(data = wine.data_subset, aes_string(x = wine.colnames[i])) +
+    geom_histogram(binwidth = diff(range(wine.data_subset[[wine.colnames[i]]]))/30, 
                    color = "black", fill = "slategray3") +
     labs(x = wine.colnames[i], y = "Frequency") +
     theme_bw()
@@ -322,20 +320,20 @@ reshape2::melt(wine.data[, 1:12], "quality") %>%
   facet_wrap(.~variable, scales = "free")
 
 # Collinearity between Attributes
-cor(wine.data) %>% 
+cor(wine.data_subset) %>% 
   corrplot::corrplot(method = 'number',  type = "lower", tl.col = "steelblue", number.cex = 0.5)
 
 # Remove quality from dataset, use good as response 
-wine.data$quality <- NULL 
+wine.data_subset$quality <- NULL 
 ```
 
 ### Data Split
 ```{r data_split}
 set.seed(123)
 # Splitting the dataset into train and test (7/10th for train remaining for test)
-inTrain <- caret::createDataPartition(wine.data$good, p = 7/10, list = F)
-train <- wine.data[inTrain,]
-test <- wine.data[-inTrain,]
+inTrain <- caret::createDataPartition(wine.data_subset$good, p = 7/10, list = F)
+train <- wine.data_subset[inTrain,]
+test <- wine.data_subset[-inTrain,]
 
 
 # Convert the outcome variable to a factor with two levels
@@ -1074,11 +1072,6 @@ cowplot::plot_grid(knn.kfoldCV.ROC.plot,
 
 #### Model Construction
 ```{r}
-set.seed(1234)
-train_control <- trainControl(method = "repeatedcv", number = 10)
-
-set.seed(1234)
-
 
 ```
 
