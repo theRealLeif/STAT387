@@ -44,7 +44,7 @@ str(wine_data)
 inTrain <- caret::createDataPartition(wine_data$good, p = 7/10, list = F)
 train <- wine_data[inTrain,]
 test <- wine_data[-inTrain,]
-
+wine_data <- wine_data[!duplicated(wine_data), ]
 
 train$good <- as.factor(train$good)
 test$good <- as.factor(test$good)
@@ -123,58 +123,63 @@ caret::confusionMatrix(test$good ,qda_pred)
 
 #### LDA  
 ```{r}
-###### caret
-# set.seed(1234)
-# train_lda <- trainControl(method = "cv", repeats = 10 )
-# set.seed(1234)
-# wine_lda <- train(good ~ . , data = train , method = "lda", trControl = train_lda)
-# 
-# #predictions
-# lda_pred <- predict(wine_lda, newdata= test)
-# caret::confusionMatrix(lda_pred, test$good )
-
-######### base R
 
 
+#Another way to split the original data into training and testing sets
+set.seed(1234) # set seed for reproducibility
+trainIndex <- sample(1:nrow(wine_data), round(0.7*nrow(wine_data)), replace=FALSE)
+train <- data[trainIndex, ]
+test <- data[-trainIndex, ]
 
+# Set up 10-fold cross-validation
+folds <- createFolds(train, k = 10, returnTrain = TRUE)
 
+# Set up a vector to store the accuracy of each fold
+accuracy <- numeric(10)
 
-
-
-
-
-
-lda.fit = qda(good ~ . , data = train, family = binomial)
-lda.fit
-# 
-# 
-set.seed(1234)
-lda.pred  = predict(lda.fit, test)
-names(lda.pred)
-lda.class = lda.pred$class
-length(test$good)
-length(lda.class)
-#      truth   , prediction
-#table(qda.class, test$good )
-#table(test$good, qda.class )
-
-
-set.seed(1234)
-my_oer <- list()
-
-for (i in 1:10){
-  train_data <- wine_data[-((i*396-395):(i*396)), ]
-  test_data <- wine_data[((i*396-395):(i*396)), ]
-  lda.fit = lda(good ~ . , data = train, family = binomial)
-  m_pred <- predict(lda.fit, test_data)
-  oer  = 1 - mean(lda.fit == test_data)
-  my_oer <- append(oer)
-
+# Loop through each fold
+for (i in 1:10)
+{
+  # Get the indices for the training and validation sets for this fold
+  trainIndex <- unlist(folds[i])
+  validIndex <- setdiff(1:nrow(train), trainIndex)
+  
+  # Train the logistic regression model on the training set for this fold
+  lda.fit <- lda(train$good ~ . , family = binomial, data = train[trainIndex,])
+  #log.reg <- glm(good ~ ., family = binomial, data = train[trainIndex, ])
+  
+  # Make predictions on the validation set for this fold
+  log.pred <- predict(lda.fit, train[validIndex, ], type = "response")
+  log.pred <- factor(ifelse(log.pred > 0.7, 1, 0), levels = c(0, 1))
+  
+  # Calculate the accuracy of the predictions for this fold
+  accuracy[i] <- mean(train$good[validIndex] == log.pred)
 }
-my_oer
-#test_err_rate=c(MAE, mean(mae))
-#MAE
 
+# Calculate the average accuracy across all folds
+mean.accuracy <- mean(accuracy)
+
+# Train the logistic regression model on the entire training set using the optimal hyperparameters
+lda.fit = lda(good ~ . , data = train, family = binomial)
+#log.reg <- glm(good ~ ., family = binomial, data = train)
+
+# Make predictions on the testing set using the trained logistic regression model
+log.pred <- predict(lda.fit, test, type = "response")
+log.pred <- factor(ifelse(log.pred) > 0.7, 1, 0), levels = c(0, 1))
+
+# Check the confusion matrix 
+length(log.pred)
+length(test$good)
+confusionMatrix(log.pred, test$good)
+
+#AUC
+log.pred <- as.numeric(log.pred)
+log.pred <- prediction(log.pred, test$good)
+log.perf <- performance(log.pred,"tpr","fpr")
+plot(log.perf,colorize=TRUE, lwd = 2)
+abline(a = 0, b = 1)
+log.auc = performance(log.pred, measure = "auc")
+print(log.auc@y.values)
 
 ```
 
