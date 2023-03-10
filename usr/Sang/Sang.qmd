@@ -17,7 +17,7 @@ format:
     smooth-scroll: true
     link-external-icon: false
     link-external-newwindow: false
-    code-fold: false
+    code-fold: true
     code-line-numbers: false
     code-overflow: scroll
     code-tools: 
@@ -104,6 +104,7 @@ font-size: 0.8em;
 
 h2, .h2, h2.anchored, 
 h3, .h3, h3.anchored,
+h4, .h4, h4.anchored,
 .quarto-title, 
 .quarto-title-meta {
 text-align: center;
@@ -122,11 +123,11 @@ font-size: 1em;
 }
 
 h5, .h5 {
-font-size: 0.75em;
+font-size: 0.9em;
 }
 
 h6, .h6 {
-font-size: 0.7em;
+font-size: 0.8em;
 }
 
 .quarto-title-meta {
@@ -917,9 +918,9 @@ polygon(x = x_values, y = y_values,
         col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
         border = NA)
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
-logit.kfoldCV.ROC_caret.plot <- recordPlot()
+logit.kfoldCV_caret.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - logit_model$results$Accuracy, 
+pander::pander(data.frame("Accuracy" = logit_model$results$Accuracy, 
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = logit_model$results$Kappa), 
@@ -965,7 +966,7 @@ polygon(x = x_values, y = y_values,
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
 logit.kfoldCV_caret_tuned.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - Accuracy,
+pander::pander(data.frame("Accuracy" = Accuracy,
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = Kappa),
@@ -1073,7 +1074,7 @@ logit.kfoldCV_MASS.plot <- accu.kappa.plot(logit_df) +
 
 
 #### Hold-out CV (`MASS`)
-```{r}
+```{r logit.holdoutCV_MASS, fig.show='hide'}
 # Set the seed for reproducibility
 set.seed(1234)
 
@@ -1128,10 +1129,18 @@ polygon(x = x_values, y = y_values,
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
 logit.holdoutCV_MASS.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - error_rate, 
+pander::pander(data.frame("Accuracy" = 1 - error_rate, 
                           "RMSE" = rmse, 
                           "MAE" = mae,
                           "Kappa" = kappa))
+```
+
+```{r logit.ROC_curve, fig.width=15, fig.height=15}
+cowplot::plot_grid(logit.kfoldCV_caret.ROC.plot,
+                   logit.kfoldCV_caret_tuned.ROC.plot,
+                   logit.kfoldCV_MASS.ROC.plot,
+                   logit.holdoutCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
 ```
 
 | Resampling Method                                | Error Rate | Sensitivity | Specificity | AUC       |
@@ -1183,7 +1192,7 @@ lda.perf <- performance(pred_obj, "tpr", "fpr")
 plot(lda.perf, colorize = TRUE, lwd = 2,
      xlab = "False Positive Rate", 
      ylab = "True Positive Rate",
-     main = "caret::qda ROC Curves")
+     main = "caret::lda ROC Curves")
 abline(a = 0, b = 1)
 x_values <- as.numeric(unlist(lda.perf@x.values))
 y_values <- as.numeric(unlist(lda.perf@y.values))
@@ -1193,7 +1202,7 @@ polygon(x = x_values, y = y_values,
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
 lda.kfoldCV_caret.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - lda_model$results$Accuracy, 
+pander::pander(data.frame("Accuracy" = lda_model$results$Accuracy, 
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = lda_model$results$Kappa), 
@@ -1298,6 +1307,11 @@ lda.kfoldCV_MASS.plot <- accu.kappa.plot(lda_df) +
   ggtitle("MASS::lda Model Performance (10-Fold CV)")
 ```
 
+```{r lda.ROC_curve, fig.width=20, fig.height=10}
+cowplot::plot_grid(lda.kfoldCV_caret.ROC.plot,
+                   lda.kfoldCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+```
 
 | Resampling Method | Error Rate | Sensitivity | Specificity | AUC       |
 | ----------------- | ---------- | ----------- | ----------- | --------- |
@@ -1346,7 +1360,7 @@ qda.perf <- performance(pred_obj, "tpr", "fpr")
 plot(qda.perf, colorize = TRUE, lwd = 2,
      xlab = "False Positive Rate", 
      ylab = "True Positive Rate",
-     main = "caret::glm ROC Curves")
+     main = "caret::qda ROC Curves")
 abline(a = 0, b = 1)
 x_values <- as.numeric(unlist(qda.perf@x.values))
 y_values <- as.numeric(unlist(qda.perf@y.values))
@@ -1360,7 +1374,7 @@ qda_df <- data.frame(k = 1:k,
                      Accuracy = qda_model$results$Accuracy,
                      Kappa = qda_model$results$Kappa)
 
-pander::pander(data.frame("Error Rate" = 1 - qda_model$results$Accuracy, 
+pander::pander(data.frame("Accuracy" = qda_model$results$Accuracy, 
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = qda_model$results$Kappa), 
@@ -1466,6 +1480,11 @@ qda.kfoldCV_MASS.plot <- accu.kappa.plot(qda_df) +
   ggtitle("MASS::qda Model Performance (10-Fold CV)")
 ```
 
+```{r qda.ROC_curve, fig.width=20, fig.height=10}
+cowplot::plot_grid(qda.kfoldCV_caret.ROC.plot,
+                   qda.kfoldCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+```
 
 | Resampling Method | Error Rate | Sensitivity | Specificity | AUC       |
 | ----------------- | ---------- | ----------- | ----------- | --------- |
@@ -1502,13 +1521,13 @@ cowplot::plot_grid(knn.kfoldCV.ROC.plot,
 | KNN Repeated CV                                  | 0.1069     | 0.9542      | 0.6344      | 0.7942878 |
 | KNN Repeated CV (Tuned)                          | 0.1204     | 0.9584      | 0.5463      | 0.7523161 |
 |                                                  |            |             |             |           |
-| Logistic Regression (`caret`)                    | 0.1793     | 0.9324      | 0.3480      | 0.6401899 |
+| Logistic Regression (`caret` 10-fold CV)         | 0.1793     | 0.9324      | 0.3480      | 0.6401899 |
 | Logistic Regression (`caret` tuned with stepAIC) | 0.1801     | 0.99272     | 0.0881      | 0.5404108 |
 | Logistic Regression (`MASS` 10-fold CV)          | 0.1616     | 1.00000     | 0.0857      | 0.5438871 |
 | Logistic Regression (`MASS` Hold-out CV)         | 0.1894     | 0.9884      | 0.1046      | 0.5465057 |
 |                                                  |            |             |             |           |
-| LDA (`caret`)                                    | 0.1919     | 0.9283      | 0.3305      | 0.6294448 |
-| LDA (`MASS`)                                     | 0.1591     | 0.9969      | 0.1143      | 0.5488133 |
+| LDA (`caret` 10-fold CV)                         | 0.1919     | 0.9283      | 0.3305      | 0.6294448 |
+| LDA (`MASS` 10-fold CV)                          | 0.1591     | 0.9969      | 0.1143      | 0.5488133 |
 |                                                  |            |             |             |           |
-| QDA (`caret`)                                    | 0.2399     | 0.7743      | 0.7013      | 0.7377967 |
-| QDA (`MASS`)                                     | 0.1692     | 0.8934      | 0.5714      | 0.7324227 |
+| QDA (`caret` 10-fold CV)                         | 0.2399     | 0.7743      | 0.7013      | 0.7377967 |
+| QDA (`MASS` 10-fold CV)                          | 0.1692     | 0.8934      | 0.5714      | 0.7324227 |

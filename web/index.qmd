@@ -918,9 +918,9 @@ polygon(x = x_values, y = y_values,
         col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
         border = NA)
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
-logit.kfoldCV.ROC_caret.plot <- recordPlot()
+logit.kfoldCV_caret.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - logit_model$results$Accuracy, 
+pander::pander(data.frame("Accuracy" = logit_model$results$Accuracy, 
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = logit_model$results$Kappa), 
@@ -966,7 +966,7 @@ polygon(x = x_values, y = y_values,
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
 logit.kfoldCV_caret_tuned.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - Accuracy,
+pander::pander(data.frame("Accuracy" = Accuracy,
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = Kappa),
@@ -1074,7 +1074,7 @@ logit.kfoldCV_MASS.plot <- accu.kappa.plot(logit_df) +
 
 
 #### Hold-out CV (`MASS`)
-```{r}
+```{r logit.holdoutCV_MASS, fig.show='hide'}
 # Set the seed for reproducibility
 set.seed(1234)
 
@@ -1129,10 +1129,18 @@ polygon(x = x_values, y = y_values,
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
 logit.holdoutCV_MASS.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - error_rate, 
+pander::pander(data.frame("Accuracy" = 1 - error_rate, 
                           "RMSE" = rmse, 
                           "MAE" = mae,
                           "Kappa" = kappa))
+```
+
+```{r logit.ROC_curve, fig.width=15, fig.height=15}
+cowplot::plot_grid(logit.kfoldCV_caret.ROC.plot,
+                   logit.kfoldCV_caret_tuned.ROC.plot,
+                   logit.kfoldCV_MASS.ROC.plot,
+                   logit.holdoutCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
 ```
 
 | Resampling Method                                | Error Rate | Sensitivity | Specificity | AUC       |
@@ -1184,7 +1192,7 @@ lda.perf <- performance(pred_obj, "tpr", "fpr")
 plot(lda.perf, colorize = TRUE, lwd = 2,
      xlab = "False Positive Rate", 
      ylab = "True Positive Rate",
-     main = "caret::qda ROC Curves")
+     main = "caret::lda ROC Curves")
 abline(a = 0, b = 1)
 x_values <- as.numeric(unlist(lda.perf@x.values))
 y_values <- as.numeric(unlist(lda.perf@y.values))
@@ -1194,7 +1202,7 @@ polygon(x = x_values, y = y_values,
 text(0.5, 0.4, paste("AUC =", round(auc_val, 4)), srt = 45, col = "steelblue")
 lda.kfoldCV_caret.ROC.plot <- recordPlot()
 
-pander::pander(data.frame("Error Rate" = 1 - lda_model$results$Accuracy, 
+pander::pander(data.frame("Accuracy" = lda_model$results$Accuracy, 
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = lda_model$results$Kappa), 
@@ -1299,6 +1307,11 @@ lda.kfoldCV_MASS.plot <- accu.kappa.plot(lda_df) +
   ggtitle("MASS::lda Model Performance (10-Fold CV)")
 ```
 
+```{r lda.ROC_curve, fig.width=20, fig.height=10}
+cowplot::plot_grid(lda.kfoldCV_caret.ROC.plot,
+                   lda.kfoldCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+```
 
 | Resampling Method | Error Rate | Sensitivity | Specificity | AUC       |
 | ----------------- | ---------- | ----------- | ----------- | --------- |
@@ -1347,7 +1360,7 @@ qda.perf <- performance(pred_obj, "tpr", "fpr")
 plot(qda.perf, colorize = TRUE, lwd = 2,
      xlab = "False Positive Rate", 
      ylab = "True Positive Rate",
-     main = "caret::glm ROC Curves")
+     main = "caret::qda ROC Curves")
 abline(a = 0, b = 1)
 x_values <- as.numeric(unlist(qda.perf@x.values))
 y_values <- as.numeric(unlist(qda.perf@y.values))
@@ -1361,7 +1374,7 @@ qda_df <- data.frame(k = 1:k,
                      Accuracy = qda_model$results$Accuracy,
                      Kappa = qda_model$results$Kappa)
 
-pander::pander(data.frame("Error Rate" = 1 - qda_model$results$Accuracy, 
+pander::pander(data.frame("Accuracy" = qda_model$results$Accuracy, 
                           "RMSE" = RMSE, 
                           "MAE" = MAE,
                           "Kappa" = qda_model$results$Kappa), 
@@ -1467,6 +1480,11 @@ qda.kfoldCV_MASS.plot <- accu.kappa.plot(qda_df) +
   ggtitle("MASS::qda Model Performance (10-Fold CV)")
 ```
 
+```{r qda.ROC_curve, fig.width=20, fig.height=10}
+cowplot::plot_grid(qda.kfoldCV_caret.ROC.plot,
+                   qda.kfoldCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+```
 
 | Resampling Method | Error Rate | Sensitivity | Specificity | AUC       |
 | ----------------- | ---------- | ----------- | ----------- | --------- |
