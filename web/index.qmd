@@ -867,7 +867,7 @@ ggarrange(knn.kfoldCV.plot,
           ncol = 2, nrow = 4)
 ```
 
-```{r knn.ROC_curve, fig.width=10}
+```{r knn.ROC_curve, fig.width=20, fig.height=10}
 cowplot::plot_grid(knn.kfoldCV.ROC.plot, knn.kfoldCV_mod.ROC.plot,
                    ncol = 2, align = "hv", scale = 0.8)
 cowplot::plot_grid(knn.holdoutCV.ROC.plot, knn.holdoutCV_mod.ROC.plot,
