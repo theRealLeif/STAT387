@@ -1,0 +1,1325 @@
+#################################################################################################################
+#------------------------------------------K-nearest Neighbors--------------------------------------------------#
+#################################################################################################################
+
+# Load libraries
+library(tidyverse)  # Load core packages: 
+                    # ggplot2,   for data visualization.
+                    # dplyr,     for data manipulation.
+                    # tidyr,     for data tidying.
+                    # purrr,     for functional programming.
+                    # tibble,    for tibbles, a modern re-imagining of data frames.
+                    # stringr,   for strings.
+                    # forcats,   for factors.
+                    # lubridate, for date/times.
+                    # readr,     for reading .csv, .tsv, and .fwf files.
+                    # readxl,    for reading .xls, and .xlxs files.
+                    # feather,   for sharing with Python and other languages.
+                    # haven,     for SPSS, SAS and Stata files.
+                    # httr,      for web apis.
+                    # jsonlite   for JSON.
+                    # rvest,     for web scraping.
+                    # xml2,      for XML.
+                    # modelr,    for modelling within a pipeline
+                    # broom,     for turning models into tidy data
+                    # hms,       for times.
+
+library(magrittr)   # Pipeline operator
+library(lobstr)     # Visualizing abstract syntax trees, stack trees, and object sizes
+library(pander)     # Exporting/converting complex pandoc documents, EX: df to Pandoc table
+library(ggforce)    # More plot functions on top of ggplot2
+library(ggpubr)     # Automatically add p-values and significance levels  plots. 
+                    # Arrange and annotate multiple plots on the same page. 
+                    # Change graphical parameters such as colors and labels.
+library(sf)         # Geo-spatial vector manipulation: points, lines, polygons
+library(kableExtra) # Generate 90 % of complex/advanced/self-customized/beautiful tables
+library(cowplot)    # Multiple plots arrangement
+library(gridExtra)  # Multiple plots arrangement
+library(animation)  # Animated figure container
+library(latex2exp)  # Latex axis titles in ggplot2
+library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 slope parameters
+library(plotly)     # User interactive plots
+library(ellipse)    # Simultaneous confidence interval region to check C.I. of 2 regressors
+library(olsrr)      # Model selections 
+library(leaps)      # Regression subsetting 
+library(pls)        # Partial Least squares
+library(MASS)       # LDA, QDA, OLS, Ridge Regression, Box-Cox, stepAIC, etc,.
+library(e1071)      # Naive Bayesian Classfier,SVM, GKNN, ICA, LCA
+library(class)      # KNN, SOM, LVQ
+library(ROCR)       # Precision/Recall/Sensitivity/Specificity performance plot 
+library(boot)       # LOOCV, Bootstrap,
+library(caret)      # Classification/Regression Training, run ?caret::trainControl
+library(corrgram)   # for correlation matrix
+library(corrplot)   # for graphical display of correlation matrix
+
+set.seed(1234)        # make random results reproducible
+
+current_dir <- getwd()
+
+if (!is.null(current_dir)) {
+  setwd(current_dir)
+  remove(current_dir)
+}
+
+#--------------------#
+#-----KNN Model------#
+#--------------------#
+
+## Model Construction
+#--------------------#
+#-----K-fold CV------#
+#--------------------#
+set.seed(1234)
+# Define the training control object for 10-fold cross-validation
+train_control <- trainControl(method = "cv", number = 10)
+
+# Train the KNN model using 10-fold cross-validation
+# tuneLength argument to specify the range of values of K to be considered for tuning
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control,
+                   tuneGrid = data.frame(k = 1:10))
+
+# Save the model into .Rdata for future import 
+save(knn_model, file = "dataset\\knn.model_kfoldCV.Rdata")
+
+
+#--------------------------#
+#-----K-fold CV (Mod)------#
+#--------------------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control, 
+                   tuneGrid = data.frame(k = 1:30))
+
+# Save the model into .Rdata for future import 
+save(knn_model, file = "dataset\\knn.model_kfoldCV_mod.Rdata")
+
+
+#--------------------#
+#----Hold-out CV-----#
+#--------------------#
+set.seed(1234)
+train_control <- trainControl(method = "none",)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn",
+                   tuneGrid = data.frame(k = 1:10))
+
+save(knn_model, file = "dataset\\knn.model_holdoutCV.Rdata")
+
+
+#--------------------------#
+#----Hold-out CV (Mod)-----#
+#--------------------------#
+set.seed(1234)
+train_control <- trainControl(method = "none",)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn",
+                   tuneGrid = expand.grid(k=1:30))
+
+save(knn_model, file = "dataset\\knn.model_holdoutCV_mod.Rdata")
+
+
+#--------------------#
+#-------LOOCV--------#
+#--------------------#
+set.seed(1234)
+train_control <- trainControl(method = "LOOCV")
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control,
+                   tuneGrid = data.frame(k = 1:10))
+
+save(knn_model, file = "dataset\\knn.model_looCV.Rdata")
+
+
+#--------------------------#
+#-------LOOCV (Mod)--------#
+#--------------------------#
+set.seed(1234)
+train_control <- trainControl(method = "LOOCV")
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control,
+                   tuneLength = 10,
+                   tuneGrid = expand.grid(k = 1:20))
+
+save(knn_model, file = "dataset\\knn.model_looCV_mod.Rdata")
+
+
+#--------------------#
+#----Repeated CV-----#
+#--------------------#
+set.seed(1234)
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "knn", 
+                   trControl = train_control)
+
+save(knn_model, file = "dataset\\knn.model_repeatedCV.Rdata")
+
+
+#--------------------------#
+#----Repeated CV (Mod)-----#
+#--------------------------#
+set.seed(1234)
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
+
+kknn.grid <- expand.grid(kmax = c(3, 5, 7 ,9, 11), distance = c(1, 2, 3),
+                         kernel = c("rectangular", "gaussian", "cos"))
+
+set.seed(1234)
+knn_model <- train(good ~ ., 
+                   data = train, 
+                   method = "kknn",
+                   trControl = train_control, 
+                   tuneGrid = kknn.grid,
+                   preProcess = c("center", "scale"))
+
+save(knn_model, file = "dataset\\knn.model_repeatedCV_mod.Rdata")
+
+###############
+## K-fold CV ##
+###############
+# Data Import
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Model Import
+load("dataset\\model\\knn.model_kfoldCV.Rdata")
+
+# Make predictions on the test data using the trained model and calculate the test error rate
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+
+# Convert predictions to a numeric vector
+knn.predictions <- as.numeric(knn.predictions)
+
+# Calculate the AUC using the performance() and auc() functions:
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+# Performance plot for TP and FP
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "KNN ROC Curves with 10-fold CV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.kfoldCV.ROC.plot<- recordPlot()
+
+knn_df <- data.frame(k = knn_model$results$k, 
+                     Accuracy = knn_model$results$Accuracy,
+                     Kappa = knn_model$results$Kappa)
+
+# Accuracy and Kappa value plot
+accu.kappa.plot <- function(model_df) {
+  p <- ggplot(data = model_df) +
+    geom_point(aes(x = k, y = Accuracy, color = "Accuracy")) +
+    geom_point(aes(x = k, y = Kappa, color = "Kappa")) +
+    geom_line(aes(x = k, y = Accuracy, linetype = "Accuracy", color = "Accuracy")) +
+    geom_line(aes(x = k, y = Kappa, linetype = "Kappa", color = "Kappa")) +
+    scale_color_manual(values = c("#98c379", "#e06c75"),
+                       guide = guide_legend(override.aes = list(linetype = c(1, 0)) )) +
+    scale_linetype_manual(values=c("solid", "dotted"),
+                          guide = guide_legend(override.aes = list(color = c("#98c379", "#e06c75")))) +
+    labs(x = "K value", 
+         y = "Accuracy / Kappa") +
+    ylim(0, 1) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    guides(color = guide_legend(title = "Metric"),
+           linetype = guide_legend(title = "Metric"))
+  return(p)
+}
+
+knn.kfoldCV.plot <- accu.kappa.plot(knn_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("KNN Model Performance (10-Fold CV)")
+
+#############
+### Tuned ###
+#############
+load("dataset\\model\\knn.model_kfoldCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "KNN ROC Curves with Tuned 10-fold CV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.kfoldCV_mod.ROC.plot <- recordPlot()
+
+knn_df <- data.frame(k = knn_model$results$k, 
+                     Accuracy = knn_model$results$Accuracy,
+                     Kappa = knn_model$results$Kappa)
+
+knn.kfoldCV_mod.plot <- accu.kappa.plot(knn_df) +
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)),  hjust = -0.3, angle=90)  +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)),  hjust = -0.3, angle=90) +
+  ggtitle("KNN Model Performance (Tuned 10-Fold CV)")
+
+###########################################
+## Hold-out CV (Validation Set Approach) ##
+###########################################
+load("dataset\\model\\knn.model_holdoutCV.Rdata")
+
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "KNN ROC Curves with Hold-out CV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.holdoutCV.ROC.plot <- recordPlot()
+
+knn_df <- data.frame(k = knn_model$results$k, 
+                     Accuracy = knn_model$results$Accuracy,
+                     Kappa = knn_model$results$Kappa)
+
+knn.holdoutCV.plot <- accu.kappa.plot(knn_df) +
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("KNN Model Performance (Hold-out CV)")
+
+#############
+### Tuned ###
+#############
+load("dataset\\model\\knn.model_holdoutCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "KNN ROC Curves with Tuned Hold-out CV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.holdoutCV_mod.ROC.plot <- recordPlot()
+
+knn_df <- data.frame(k = knn_model$results$k, 
+                     Accuracy = knn_model$results$Accuracy,
+                     Kappa = knn_model$results$Kappa)
+
+knn.holdoutCV_mod.plot <- accu.kappa.plot(knn_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), hjust = -0.3, angle=90) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), hjust=-0.3, angle=90) +
+  ggtitle("KNN Model Performance (Tuned Hold-out CV)")
+
+
+###########
+## LOOCV ##
+###########
+load("dataset\\model\\knn.model_looCV.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "KNN ROC Curves with LOOCV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.looCV.ROC.plot <- recordPlot()
+
+knn_df <- data.frame(k = knn_model$results$k, 
+                     Accuracy = knn_model$results$Accuracy,
+                     Kappa = knn_model$results$Kappa)
+
+knn.looCV.plot <- accu.kappa.plot(knn_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("KNN Model Performance (LOOCV)")
+
+#############
+### Tuned ###
+#############
+load("dataset\\model\\knn.model_looCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "Knn ROC Curves Tuned LOOCV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.looCV_mod.ROC.plot <- recordPlot()
+
+knn_df <- data.frame(k = knn_model$results$k, 
+                     Accuracy = knn_model$results$Accuracy,
+                     Kappa = knn_model$results$Kappa)
+
+knn.looCV_mod.plot <- accu.kappa.plot(knn_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), hjust = -0.3, angle=90) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), hjust = -0.3, angle=90) +
+  ggtitle("KNN Model Performance (Tuned LOOCV)")
+
+
+#################
+## Repeated CV ##
+#################
+load("dataset\\model\\knn.model_repeatedCV.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "KNN ROC Curves with Repeated CV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.repeatedCV.ROC.plot <- recordPlot()
+
+knn_df <- knn_model$results
+knn.repeatedCV.plot <- ggplot(data=knn_df, aes(x = kmax, y = Accuracy)) +
+  geom_point(aes(color = "Accuracy")) +
+  geom_point(aes(color = "Kappa")) +
+  geom_line(aes(linetype = "Accuracy", color = "Accuracy")) +
+  geom_line(aes(y = Kappa, linetype = "Kappa", color = "Kappa")) +
+  geom_text(aes(label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  scale_color_manual(values = c("#98c379", "#e06c75"),
+                     guide = guide_legend(override.aes = list(linetype = c(1, 0)) )) +
+  scale_linetype_manual(values=c("solid", "dotted"),
+                        guide = guide_legend(override.aes = list(color = c("#98c379", "#e06c75")))) +
+  labs(x = "K value", 
+       y = "Accuracy / Kappa",
+       title = "KNN Model Performance (Repeated CV)") +
+  ylim(0, 1) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  guides(color = guide_legend(title = "Metric"),
+         linetype = guide_legend(title = "Metric"))
+
+#############
+### Tuned ###
+#############
+load("dataset\\model\\knn.model_repeatedCV_mod.Rdata")
+
+knn.predictions <- predict(knn_model, newdata = test)
+
+confusionMatrix(knn.predictions, test$good)
+
+knn.predictions <- as.numeric(knn.predictions)
+pred_obj <- prediction(knn.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "KNN ROC Curves with Tuned Repeated CV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+knn.repeatedCV_mod.ROC.plot <- recordPlot()
+
+knn.repeatedCV_mod.plot <- ggplot(knn_model) +
+  labs(x = "K value", 
+       y = "Accuracy", 
+       title = "KNN Model Performance (Tuned Repeated CV)") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+
+#############
+## Summary ##
+#############
+ggarrange(knn.kfoldCV.plot,
+          knn.kfoldCV_mod.plot,
+          knn.holdoutCV.plot,
+          knn.holdoutCV_mod.plot,
+          knn.looCV.plot,
+          knn.looCV_mod.plot,
+          knn.repeatedCV.plot,
+          knn.repeatedCV_mod.plot,
+          ncol = 2, nrow = 4)
+
+
+cowplot::plot_grid(knn.kfoldCV.ROC.plot, knn.kfoldCV_mod.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+cowplot::plot_grid(knn.holdoutCV.ROC.plot, knn.holdoutCV_mod.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+cowplot::plot_grid(knn.looCV.ROC.plot, knn.looCV_mod.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+cowplot::plot_grid(knn.repeatedCV.ROC.plot, knn.repeatedCV_mod.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+
+
+# | Resampling Method    | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | K-Fold CV            | 0.1692     | 0.9615      | 0.2775      | 0.6195157 |
+# | K-Fold CV (Tuned)    | 0.1953     | 0.9750      | 0.0837      | 0.5293632 |
+# | Hold-out CV          | 0.1768     | 0.9563      | 0.2599      | 0.6081037 |
+# | Hold-out CV  (Tuned) | 0.1944     | 0.9886      | 0.0308      | 0.5096953 |
+# | LOOCV                | 0.1692     | 0.9605      | 0.2819      | 0.6211981 |
+# | LOOCV (Tuned)        | 0.1961     | 0.9740      | 0.0837      | 0.5288429 |
+# | Repeated CV          | 0.1069     | 0.9542      | 0.6344      | 0.7942878 |
+# | Repeated CV (Tuned)  | 0.1204     | 0.9584      | 0.5463      | 0.7523161 |
+
+save(knn.kfoldCV.ROC.plot, file = "dataset\\plot\\knn.kfoldCV.ROC.plot.Rdata")
+save(knn.kfoldCV_mod.ROC.plot, file = "dataset\\plot\\knn.kfoldCV_mod.ROC.plot.Rdata")
+save(knn.holdoutCV.ROC.plot, file = "dataset\\plot\\knn.holdoutCV.ROC.plot.Rdata.Rdata")
+save(knn.holdoutCV_mod.ROC.plot, file = "dataset\\plot\\knn.holdoutCV_mod.ROC.plot.Rdata")
+save(knn.looCV.ROC.plot, file = "dataset\\plot\\knn.looCV.ROC.plot.Rdata")
+save(knn.looCV_mod.ROC.plot, file = "dataset\\plot\\knn.looCV_mod.ROC.plot.Rdata")
+save(knn.repeatedCV.ROC.plot, file = "dataset\\plot\\knn.repeatedCV.ROC.plot.Rdata")
+save(knn.repeatedCV_mod.ROC.plot, file = "dataset\\plot\\knn.repeatedCV_mod.ROC.plot.Rdata")
+
+save(knn.kfoldCV.plot, file = "dataset\\plot\\knn.kfoldCV.plot.Rdata")
+save(knn.kfoldCV_mod.plot, file = "dataset\\plot\\knn.kfoldCV_mod.plot.Rdata")
+save(knn.holdoutCV.plot, file = "dataset\\plot\\knn.holdoutCV.plot.Rdata")
+save(knn.holdoutCV_mod.plot, file = "dataset\\plot\\knn.holdoutCV_mod.plot.Rdata")
+save(knn.looCV.plot, file = "dataset\\plot\\knn.looCV.plot.Rdata")
+save(knn.looCV_mod.plot, file = "dataset\\plot\\knn.looCV_mod.plot.Rdata")
+save(knn.repeatedCV.plot, file = "dataset\\plot\\knn.repeatedCV.plot.Rdata")
+save(knn.repeatedCV_mod.plot, file = "dataset\\plot\\knn.repeatedCV_mod.plot.Rdata")
+
+save(accu.kappa.plot, file = "dataset\\function\\accu.kappa.plot.Rdata")
+
+#################################################################################################################
+#------------------------------------------Logistic Regression--------------------------------------------------#
+#################################################################################################################
+
+#########################
+## K-fold CV (`caret`) ##
+#########################
+
+#---------------------------#
+#----Model Construction-----#
+#---------------------------#
+set.seed(1234)
+# Define the training control object for 10-fold cross-validation
+train_control <- trainControl(method = "cv", number = 10)
+
+# Train the logistic regression model using 10-fold cross-validation
+set.seed(1234)
+logit_model <- train(good ~ ., 
+                     data = train, 
+                     method = "glm", 
+                     family = "binomial",
+                     trControl = train_control)
+
+save(logit_model, file = "dataset\\logit.model_kfoldCV.Rdata")
+
+
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model Import
+load("dataset\\model\\logit.model_kfoldCV.Rdata")
+
+logit.predictions <- predict(logit_model, newdata = test)
+
+confusionMatrix(logit.predictions, test$good)
+
+
+logit.predictions <- as.numeric(logit.predictions)
+pred_obj <- prediction(logit.predictions, test$good)
+
+# Compute the RMSE and MAE
+RMSE <- caret::RMSE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+MAE <- caret::MAE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+
+# Compute AUC value
+auc_val  <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+log.perf <- performance(pred_obj, "tpr", "fpr")
+plot(log.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "caret::glm ROC Curves")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(log.perf@x.values))
+y_values <- as.numeric(unlist(log.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+logit.kfoldCV_caret.ROC.plot <- recordPlot()
+
+pander::pander(data.frame("Accuracy" = logit_model$results$Accuracy, 
+                          "RMSE" = RMSE, 
+                          "MAE" = MAE,
+                          "Kappa" = logit_model$results$Kappa), 
+               caption = "caret::glm Performance (10-fold CV)")
+
+###############################
+## K-fold CV Tuned (`caret`) ##
+###############################
+glm.model <- glm(good ~ ., data= train,family="binomial")
+glm.fit= stepAIC(glm.model, direction = 'backward')
+
+# Make predictions on test data and construct a confusion matrix
+logit.predictions <- predict(glm.fit, newdata = test,type = "response")
+logit.predictions <- factor(ifelse(logit.predictions > 0.7, 1, 0),
+                            levels = c(0, 1))
+confusionMatrix(logit.predictions, test$good)
+
+Accuracy <- confusionMatrix(logit.predictions, test$good)$overall[[1]]
+Kappa <- confusionMatrix(logit.predictions, test$good)$overall[[2]] 
+
+logit.predictions <- as.numeric(logit.predictions)
+pred_obj <- prediction(logit.predictions, test$good)
+
+# Compute the RMSE and MAE
+RMSE <- caret::RMSE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+MAE <- caret::MAE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+
+# Compute AUC value
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+log.perf <- performance(pred_obj, "tpr", "fpr")
+plot(log.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "caret::glm ROC Curves with stepAIC")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(log.perf@x.values))
+y_values <- as.numeric(unlist(log.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+logit.kfoldCV_caret_tuned.ROC.plot <- recordPlot()
+
+pander::pander(data.frame("Accuracy" = Accuracy,
+                          "RMSE" = RMSE, 
+                          "MAE" = MAE,
+                          "Kappa" = Kappa),
+               caption = "caret::glm Performance (10-fold CV with stepAIC)")
+
+########################
+## K-fold CV (`MASS`) ##
+########################
+# Set the number of folds
+k <- 10
+
+# Randomly assign each row in the data to a fold
+set.seed(1234) # for reproducibility
+fold_indices <- sample(rep(1:k, length.out = nrow(wine.data_cleaned)))
+
+# Initialize an empty list to store the folds
+folds <- vector("list", k)
+
+# Assign each row to a fold
+for (i in 1:k) {
+  folds[[i]] <- which(fold_indices == i)
+}
+
+#To store the error rate of each fold
+error_rate <- numeric(k)
+rmse <- numeric(k)
+mae <- numeric(k)
+kappa <- numeric(k)
+confusion_matrices <- vector("list", k)
+
+# Loop through each fold
+for (i in 1:k) {
+  # Extract the i-th fold as the testing set
+  test_indices <- unlist(folds[[i]])
+  
+  test <- wine.data_cleaned[test_indices, ]
+  train <- wine.data_cleaned[-test_indices, ]
+  
+  # Fit the model on the training set
+  logit_model <- glm(good ~ ., data = train, family = binomial)
+  
+  # Make predictions on the testing set and calculate the error rate
+  log.pred <- predict(logit_model, newdata = test, type = "response")
+  predicted_classes <- as.numeric(ifelse(log.pred > 0.7, 1, 0))
+  
+  # Compute RMSE
+  rmse[i] <- sqrt(mean((predicted_classes - test$good) ^ 2))
+  
+  # Compute MAE
+  mae[i] <- mean(abs(predicted_classes - test$good))
+  
+  # Compute MAE
+  error_rate[i] <- mean((predicted_classes> 0.7) != test$good)
+  
+  # Compute confusion matrix
+  test$good <- as.factor(test$good)
+  predicted_classes <- factor(ifelse(log.pred > 0.7, 1, 0), levels = c(0, 1))
+  confusion_matrices[[i]] <- caret::confusionMatrix(predicted_classes, test$good)
+  
+  # Compute Kappa value
+  kappa[i] <- confusion_matrices[[i]]$overall[[2]]
+  
+  # Print the error rates for each fold
+  cat(paste0("Fold ", i, ": ", "OER:", error_rate[i], " RMSE:", rmse[i], " MAE:", mae[i], "\n"))
+}
+
+best_confmat_index <- which.min(error_rate)
+best_confmat_index
+best_confmat_indexi <- which.min(rmse)
+best_confmat_index
+best_confmat_index <- which.min(mae)
+best_confmat_index
+confusion_matrices[best_confmat_index]
+
+#AUC and Performance Plot
+predicted_classes <- as.numeric(predicted_classes)
+pred_obj <- prediction(predicted_classes, test$good)
+auc_val  <- performance(pred_obj, "auc")@y.values[[1]]
+log.perf <- performance(pred_obj,"tpr","fpr")
+auc_val  <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+plot(log.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "MASS::glm ROC Curves")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(log.perf@x.values))
+y_values <- as.numeric(unlist(log.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+logit.kfoldCV_MASS.ROC.plot <- recordPlot()
+
+logit_df <- data.frame(k = 1:k,
+                       Accuracy = 1-error_rate, 
+                       Kappa = kappa)
+
+logit.kfoldCV_MASS.plot <- accu.kappa.plot(logit_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("MASS::glm Model Performance (10-Fold CV)")
+
+##########################
+## Hold-out CV (`MASS`) ##
+##########################
+# Set the seed for reproducibility
+set.seed(1234)
+
+# Proportion of data to use for training
+train_prop <- 0.7
+
+# Split the data into training and testing sets
+train_indices <- sample(seq_len(nrow(wine.data_cleaned)), size = round(train_prop * nrow(wine.data_cleaned)), replace = FALSE)
+train <- wine.data_cleaned[train_indices, ]
+test <- wine.data_cleaned[-train_indices, ]
+
+# Fit the model on the training set
+logit_model <- glm(good ~ ., data = train, family = binomial)
+
+# Make predictions on the testing set and calculate the error rate
+log.pred <- predict(logit_model, newdata = test, type = "response")
+predicted_classes <- as.numeric(ifelse(log.pred > 0.7, 1, 0))
+
+# Compute RMSE
+rmse <- sqrt(mean((predicted_classes - test$good) ^ 2))
+
+# Compute MAE
+mae <- mean(abs(predicted_classes - test$good))
+
+# Compute error rate
+error_rate <- mean((predicted_classes > 0.7) != test$good)
+
+# Calculate the accuracy of the predictions on the testing set
+train$good <- as.numeric(train$good)
+test$good <- as.factor(test$good)
+predicted_classes <- factor(ifelse(log.pred > 0.7, 1, 0), levels = c(0, 1))
+confusionMatrix(predicted_classes, test$good)
+kappa <- confusionMatrix(predicted_classes, test$good)$overall[[2]]
+
+#AUC and Performance Plot
+predicted_classes <- as.numeric(predicted_classes)
+pred_obj <- prediction(predicted_classes, test$good)
+log.perf <- performance(pred_obj,"tpr","fpr")
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+plot(log.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "MASS::glm ROC Curves with Hold-out CV")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(log.perf@x.values))
+y_values <- as.numeric(unlist(log.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+logit.holdoutCV_MASS.ROC.plot <- recordPlot()
+
+pander::pander(data.frame("Accuracy" = 1 - error_rate, 
+                          "RMSE" = rmse, 
+                          "MAE" = mae,
+                          "Kappa" = kappa))
+
+#############
+## Summary ##
+#############
+cowplot::plot_grid(logit.kfoldCV_caret.ROC.plot,
+                   logit.kfoldCV_caret_tuned.ROC.plot,
+                   logit.kfoldCV_MASS.ROC.plot,
+                   logit.holdoutCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+
+
+
+# | Resampling Method                                | Error Rate | Sensitivity | Specificity | AUC       |
+# | ------------------------------------------------ | ---------- | ----------- | ----------- | --------- |
+# | Logistic Regression (`caret`)                    | 0.1793     | 0.9324      | 0.3480      | 0.6401899 |
+# | Logistic Regression (`caret` tuned with stepAIC) | 0.1801     | 0.9927      | 0.0881      | 0.5404108 |
+# | Logistic Regression (`MASS` 10-fold CV)          | 0.1616     | 1.0000      | 0.0857      | 0.5438871 |
+# | Logistic Regression (`MASS` Hold-out CV)         | 0.1894     | 0.9884      | 0.1046      | 0.5465057 |
+
+
+save(logit.kfoldCV_MASS.plot, file = "dataset\\plot\\logit.kfoldCV_MASS.plot.Rdata")
+save(logit.kfoldCV_caret.ROC.plot, file = "dataset\\plot\\logit.kfoldCV_caret.ROC.plot.Rdata")
+save(logit.kfoldCV_caret_tuned.ROC.plot, file = "dataset\\plot\\logit.kfoldCV_caret_tuned.ROC.plot.Rdata")
+save(logit.kfoldCV_MASS.ROC.plot, file = "dataset\\plot\\logit.kfoldCV_MASS.ROC.plot.Rdata")
+save(logit.holdoutCV_MASS.ROC.plot, file = "dataset\\plot\\logit.holdoutCV_MASS.ROC.plot.Rdata")
+
+
+#################################################################################################################
+#---------------------------------------Linear Discriminant Analysis--------------------------------------------#
+#################################################################################################################
+
+## K-fold CV (`caret`)
+#---------------------------#
+#----Model Construction-----#
+#---------------------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+lda_model <- train(as.factor(good) ~ ., 
+                   data = train, 
+                   method = "lda", 
+                   trControl = train_control)
+
+save(lda_model, file = "dataset\\lda.model_kfoldCV.Rdata")
+
+
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\lda.model_kfoldCV.Rdata")
+
+lda.predictions <- predict(lda_model, newdata = test)
+
+confusionMatrix(lda.predictions, test$good)
+
+
+lda.predictions <- as.numeric(lda.predictions)
+pred_obj <- prediction(lda.predictions, test$good)
+
+# Compute the RMSE and MAE
+RMSE <- caret::RMSE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+MAE <- caret::MAE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+
+# Compute AUC value
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+lda.perf <- performance(pred_obj, "tpr", "fpr")
+plot(lda.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "caret::lda ROC Curves")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(lda.perf@x.values))
+y_values <- as.numeric(unlist(lda.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+lda.kfoldCV_caret.ROC.plot <- recordPlot()
+
+pander::pander(data.frame("Accuracy" = lda_model$results$Accuracy, 
+                          "RMSE" = RMSE, 
+                          "MAE" = MAE,
+                          "Kappa" = lda_model$results$Kappa), 
+               caption = "caret::lda Performance (10-fold CV)")
+
+
+## K-fold CV (`MASS`)
+# Set the number of folds
+k <- 10
+
+# Randomly assign each row in the data to a fold
+set.seed(1234) # for reproducibility
+fold_indices <- sample(rep(1:k, length.out = nrow(wine.data_cleaned)))
+
+# Initialize an empty list to store the folds
+folds <- vector("list", k)
+
+# Assign each row to a fold
+for (i in 1:k) {
+  folds[[i]] <- which(fold_indices == i)
+}
+
+#To store the error rate of each fold
+error_rate <- numeric(k)
+rmse <- numeric(k)
+mae <- numeric(k)
+kappa <- numeric(k)
+confusion_matrices <- vector("list", k)
+
+# Loop through each fold
+for (i in 1:10) {
+  # Extract the i-th fold as the testing set
+  test_indices <- unlist(folds[[i]])
+  
+  test <- wine.data_cleaned[test_indices, ]
+  train <- wine.data_cleaned[-test_indices, ]
+  
+  # Fit the model on the training set
+  lda_model <- lda(good ~ ., data = train, family = binomial)
+  
+  # Make predictions on the testing set and calculate the error rate
+  lda.pred <- predict(lda_model, newdata = test, type = "response")
+  predicted_classes <- ifelse(lda.pred$posterior[, 2] > 0.7, 1, 0)
+  
+  # Compute RMSE
+  rmse[i] <- sqrt(mean((predicted_classes - as.numeric(test$good)) ^ 2))
+  
+  # Compute MAE
+  mae[i] <- mean(abs(predicted_classes - as.numeric(test$good)))
+  
+  # Compute OER
+  error_rate[i] <- mean((predicted_classes > 0.7) != as.numeric(test$good))
+  
+  # Compute confusion matrix
+  test$good <- as.factor(test$good)
+  predicted_classes <- factor(predicted_classes, levels = c(0, 1))
+  confusion_matrices[[i]] <- caret::confusionMatrix(predicted_classes, test$good)
+  
+  # Compute Kappa value
+  kappa[i] <- confusion_matrices[[i]]$overall[[2]]
+  
+  # Print the error rates for each fold
+  cat(paste0("Fold ", i, ": ", "OER:", error_rate[i], " RMSE:", rmse[i], " MAE:", mae[i], "\n"))
+}
+
+best_confmat_index <- which.min(error_rate)
+best_confmat_index
+best_confmat_indexi <- which.min(rmse)
+best_confmat_index
+best_confmat_index <- which.min(mae)
+best_confmat_index
+confusion_matrices[best_confmat_index]
+
+#AUC and Performance Plot
+predicted_classes <- as.numeric(predicted_classes)
+pred_obj <- prediction(predicted_classes, test$good)
+lda.perf <- performance(pred_obj,"tpr","fpr")
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+plot(lda.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "MASS::lda ROC Curves")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(lda.perf@x.values))
+y_values <- as.numeric(unlist(lda.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+lda.kfoldCV_MASS.ROC.plot <- recordPlot()
+
+lda_df <- data.frame(k = 1:k,
+                     Accuracy = 1-error_rate, 
+                     Kappa = kappa)
+
+lda.kfoldCV_MASS.plot <- accu.kappa.plot(lda_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("MASS::lda Model Performance (10-Fold CV)")
+
+
+#############
+## Summary ##
+#############
+cowplot::plot_grid(lda.kfoldCV_caret.ROC.plot,
+                   lda.kfoldCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+
+
+# | Resampling Method | Error Rate | Sensitivity | Specificity | AUC       |
+# | ----------------- | ---------- | ----------- | ----------- | --------- |
+# | LDA (`caret`)     | 0.1919     | 0.9283      | 0.3305      | 0.6294448 |
+# | LDA (`MASS`)      | 0.1591     | 0.9969      | 0.1143      | 0.5488133 |
+
+save(lda.kfoldCV_MASS.plot, file = "dataset\\plot\\lda.kfoldCV_MASS.plot.Rdata")
+save(lda.kfoldCV_caret.ROC.plot, file = "dataset\\plot\\lda.kfoldCV_caret.ROC.plot.Rdata")
+save(lda.kfoldCV_MASS.ROC.plot, file = "dataset\\plot\\lda.kfoldCV_MASS.ROC.plot.Rdata")
+
+
+#################################################################################################################
+#-----------------------------------------------Quadratic Discriminant Analysis---------------------------------#
+#################################################################################################################
+
+#########################
+## K-fold CV (`caret`) ##
+#########################
+#---------------------------#
+#----Model Construction-----#
+#---------------------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+qda_model <- train(good ~ ., 
+                   data = train, 
+                   method = "qda", 
+                   trControl = train_control)
+
+save(qda_model, file = "dataset\\qda.model_kfoldCV.Rdata")
+
+
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\qda.model_kfoldCV.Rdata")
+
+qda.predictions <- predict(qda_model, newdata = test)
+
+confusionMatrix(qda.predictions, test$good)
+
+k <- 10
+qda.predictions <- as.numeric(qda.predictions)
+pred_obj <- prediction(qda.predictions, test$good)
+# Compute the RMSE and MAE
+RMSE <- caret::RMSE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+MAE <- caret::MAE(as.numeric(unlist(pred_obj@predictions)), as.numeric(test$good))
+
+# Compute AUC value
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+qda.perf <- performance(pred_obj, "tpr", "fpr")
+plot(qda.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "caret::qda ROC Curves")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(qda.perf@x.values))
+y_values <- as.numeric(unlist(qda.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+qda.kfoldCV_caret.ROC.plot <- recordPlot()
+
+qda_df <- data.frame(k = 1:k,
+                     Accuracy = qda_model$results$Accuracy,
+                     Kappa = qda_model$results$Kappa)
+
+pander::pander(data.frame("Accuracy" = qda_model$results$Accuracy, 
+                          "RMSE" = RMSE, 
+                          "MAE" = MAE,
+                          "Kappa" = qda_model$results$Kappa), 
+               caption = "caret::qda Performance (10-fold CV)")
+
+
+########################
+## K-fold CV (`MASS`) ##
+########################
+# Set the number of folds
+k <- 10
+
+# Randomly assign each row in the data to a fold
+set.seed(1234) # for reproducibility
+fold_indices <- sample(rep(1:k, length.out = nrow(wine.data_cleaned)))
+
+# Initialize an empty list to store the folds
+folds <- vector("list", k)
+
+# Assign each row to a fold
+for (i in 1:k) {
+  folds[[i]] <- which(fold_indices == i)
+}
+
+#To store the error rate of each fold
+error_rate <- numeric(k)
+rmse <- numeric(k)
+mae <- numeric(k)
+confusion_matrices <- vector("list", k)
+kappa <- numeric(k)
+
+
+# Loop through each fold
+for (i in 1:10) {
+  # Extract the i-th fold as the testing set
+  test_indices <- unlist(folds[[i]])
+  
+  test <- wine.data_cleaned[test_indices, ]
+  train <- wine.data_cleaned[-test_indices, ]
+  
+  # Fit the model on the training set
+  qda_model <- qda(good ~ ., data = train, family = binomial)
+  
+  # Make predictions on the testing set and calculate the error rate
+  qda.pred <- predict(qda_model, newdata = test, type = "response")
+  predicted_classes <- ifelse(qda.pred$posterior[,2] > 0.7, 1, 0)
+  
+  # Compute RMSE
+  rmse[i] <- sqrt(mean((predicted_classes - as.numeric(test$good)) ^ 2))
+  
+  # Compute MAE
+  mae[i] <- mean(abs(predicted_classes - as.numeric(test$good)))
+  
+  # Compute OER
+  error_rate[i] <- mean((predicted_classes > 0.7) != as.numeric(test$good))
+  
+  # Compute confusion matrix
+  test$good <- as.factor(test$good)
+  predicted_classes <- factor(predicted_classes, levels = c(0, 1))
+  confusion_matrices[[i]] <- caret::confusionMatrix(predicted_classes, test$good)
+  
+  # Compute Kappa value
+  kappa[i] <- confusion_matrices[[i]]$overall[[2]]
+  
+  # Print the error rates for each fold
+  cat(paste0("Fold ", i, ": ", "OER:", error_rate[i], " RMSE:", rmse[i], " MAE:", mae[i], "\n"))
+}
+
+best_confmat_index <- which.min(error_rate)
+best_confmat_index
+best_confmat_indexi <- which.min(rmse)
+best_confmat_index
+best_confmat_index <- which.min(mae)
+best_confmat_index
+confusion_matrices[best_confmat_index]
+
+#AUC and Performance Plot
+predicted_classes <- as.numeric(predicted_classes)
+pred_obj <- prediction(predicted_classes, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+qda.perf <- performance(pred_obj,"tpr","fpr")
+auc_val
+
+plot(qda.perf, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "MASS::qda ROC Curves")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(qda.perf@x.values))
+y_values <- as.numeric(unlist(qda.perf@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+qda.kfoldCV_MASS.ROC.plot <- recordPlot()
+
+qda_df <- data.frame(k = 1:k,
+                     Accuracy = 1-error_rate, 
+                     Kappa = kappa)
+
+qda.kfoldCV_MASS.plot <- accu.kappa.plot(qda_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), vjust = -1) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), vjust = -1) +
+  ggtitle("MASS::qda Model Performance (10-Fold CV)")
+
+
+#############
+## Summary ##
+#############
+cowplot::plot_grid(qda.kfoldCV_caret.ROC.plot,
+                   qda.kfoldCV_MASS.ROC.plot,
+                   ncol = 2, align = "hv", scale = 0.8)
+
+
+# | Resampling Method | Error Rate | Sensitivity | Specificity | AUC       |
+# | ----------------- | ---------- | ----------- | ----------- | --------- |
+# | QDA (`caret`)     | 0.2399     | 0.7743      | 0.7013      | 0.7377967 |
+# | QDA (`MASS`)      | 0.1692     | 0.8934      | 0.5714      | 0.7324227 |
+#   
+
+save(qda.kfoldCV_MASS.plot, file = "dataset\\plot\\qda.kfoldCV_MASS.plot.Rdata")
+save(qda.kfoldCV_caret.ROC.plot, file = "dataset\\plot\\qda.kfoldCV_caret.ROC.plot.Rdata")
+save(qda.kfoldCV_MASS.ROC.plot, file = "dataset\\plot\\qda.kfoldCV_MASS.ROC.plot.Rdata")
+
