@@ -34,11 +34,11 @@ Which of the following classifiers would you recommend? Justify your answer.
  ┃ ┣ 📂data                         // Raw Data
  ┃ ┃ ┣ 📄winequality-white.csv
  ┃ ┃ ┗ 📄winequality.names
- ┃ ┣ 📄Step.1_KNN.R
- ┃ ┣ 📄Step.2_Logit.R
- ┃ ┣ 📄Step.3_LDA.R
- ┃ ┣ 📄Step.4_QDA.R
- ┃ ┗ 📄Step.99_Complete_Code.R
+ ┃ ┣ 📄KNN.R
+ ┃ ┣ 📄Logit.R
+ ┃ ┣ 📄LDA.R
+ ┃ ┣ 📄QDA.R
+ ┃ ┗ 📄Complete_Code.R
  ┣ 📂usr                            // Member Contributions
  ┃ ┣ 📂Alana
  ┃ ┣ 📂Leif
