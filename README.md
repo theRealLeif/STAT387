@@ -39,10 +39,10 @@ Which of the following classifiers would you recommend? Justify your answer.
  ┃ ┣ 📄LDA.R
  ┃ ┣ 📄QDA.R
  ┃ ┗ 📄Complete_Code.R
- ┣ 📂usr                            // Member Contributions
+ ┣ 📂usr                            // Contributtors
  ┃ ┣ 📂Alana
  ┃ ┣ 📂Leif
- ┃ ┗ 📂Sang
+ ┃ ┣ 📂Sang
  ┃ ┗ 📂web   
  ┣ 📂web                            // Repository Website
  ┣ 📄.gitignore
