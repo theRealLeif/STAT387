@@ -1,7 +1,3 @@
-#################################################################################################################
-#------------------------------------------K-nearest Neighbors--------------------------------------------------#
-#################################################################################################################
-
 # Load libraries
 library(tidyverse)  # Load core packages: 
                     # ggplot2,   for data visualization.
@@ -61,9 +57,131 @@ if (!is.null(current_dir)) {
   remove(current_dir)
 }
 
-#--------------------#
-#-----KNN Model------#
-#--------------------#
+knitr::opts_chunk$set(fig.align = TRUE)
+
+#################################################################################################################
+#---------------------------------------------Data Analysis-----------------------------------------------------#
+#################################################################################################################
+
+## Data Description
+
+# This is a dataset of wine quality containing 4898 observations of 12 variables. The variables are:
+   
+# -   `fixed.acidity`: The amount of fixed acid in the wine ($g/dm^3$)
+# -   `volatile.acidity`: The amount of volatile acid in the wine ($g/dm^4$)
+# -   `citric.acid`: The amount of citric acid in the wine ($g/dm^3$)
+# -   `residual.sugar`: The amount of residual sugar in the wine ($g/dm^3$)
+# -   `chlorides`: The amount of salt in the wine ($g/dm^3$)
+# -   `free.sulfur.dioxide`: The amount of free sulfur dioxide in the wine ($mg/dm^3$)
+# -   `total.sulfur.dioxide`: The amount of total sulfur dioxide in the wine ($mg/dm^3$)
+# -   `density`: The density of the wine ($g/dm^3$)
+# -   `pH`: The $pH$ value of the wine
+# -   `sulphates`: The amount of sulphates in the wine ($g/dm^3$)
+# -   `alcohol`: The alcohol content of the wine ($\% vol$)
+# -   `quality`: The quality score of the wine (0-10)
+
+# After removing the duplicate rows from our data set, we are left with 3961 observations of the above 11 variables minus `quality` column variable, and introduced a new variable `good` as our response:
+   
+# -   `good`: A binary variable indicating whether the wine is good (`quality` $\geq$ 7) or not (`quality` $<$ 7).
+
+
+## Data Import
+# Import original dataset
+wine.data <- read.csv("dataset\\winequality-white.csv", sep=";", header = T)
+
+str(wine.data)
+
+# Removing duplicate Rows, mutate our categorical response good
+wine.data_cleaned <-  wine.data %>% mutate(good = ifelse(quality>=7, 1, 0)) %>% distinct() %>% dplyr::select(-quality)
+
+str(wine.data_cleaned)
+
+
+## Data Analysis
+dim(wine.data)
+
+dim(wine.data_cleaned)
+
+summary(wine.data)
+
+summary(wine.data_cleaned)
+
+# Check for NAs in dataset
+sum(is.na(wine.data))
+
+# Counts for response's at each factor level
+table(wine.data$quality)
+
+## Data Distribution
+wine.colnames <- colnames(wine.data[, 1:12])
+num_plots     <- length(wine.colnames)
+num_rows      <- ceiling(num_plots/3)
+
+
+# Create an empty list to store plots
+grid_arr      <- list()
+
+
+# Loop over each column name in the wine.colnames vector
+for(i in 1:num_plots) {
+  # Create a ggplot object for the current column using aes
+  plt <- ggplot(data = wine.data, aes_string(x = wine.colnames[i])) +
+    geom_histogram(binwidth = diff(range(wine.data[[wine.colnames[i]]]))/30, 
+                   color = "black", fill = "slategray3") +
+    labs(x = wine.colnames[i], y = "Frequency") +
+    theme_bw()
+  
+  # Add the current plot to the grid_arr list
+  grid_arr[[i]] <- plt
+}
+
+grid_arr <- do.call(gridExtra::grid.arrange, c(grid_arr, ncol = 3))
+
+
+# Remove unnecessary variables
+remove(grid_arr)
+remove(plt)
+remove(i)
+remove(num_plots)
+remove(num_rows)
+
+
+## Data Relationships
+reshape2::melt(wine.data_cleaned[, 1:12], "good") %>% 
+  ggplot(aes(value, good, color = variable)) +  
+  geom_point() + 
+  geom_smooth(aes(value, good, colour=variable), method=lm, se=FALSE)+
+  facet_wrap(.~variable, scales = "free")
+
+# Collinearity between Attributes
+cor(wine.data_cleaned) %>% 
+  corrplot::corrplot(method = 'number',  type = "lower", tl.col = "steelblue", number.cex = 0.5)
+
+
+## Data Split
+set.seed(1234)
+# Splitting the dataset into train and test (7/10th for train remaining for test)
+inTrain <- caret::createDataPartition(wine.data_cleaned$good, p = 7/10, list = F)
+train <- wine.data_cleaned[inTrain,]
+test  <- wine.data_cleaned[-inTrain,]
+
+
+# Convert the outcome variable to a factor with two levels
+train$good <- as.factor(train$good)
+test$good <- as.factor(test$good)
+
+# Save data for building models in the next step
+save(wine.data, file = "dataset\\wine.data.Rdata")
+save(wine.data_cleaned, file = "dataset\\wine.data_cleaned.Rdata")
+save(train, file = "dataset\\train.Rdata")
+save(test, file = "dataset\\test.Rdata")
+
+
+
+
+#################################################################################################################
+#------------------------------------------K-nearest Neighbors--------------------------------------------------#
+#################################################################################################################
 
 ## Model Construction
 #--------------------#
@@ -1317,7 +1435,7 @@ cowplot::plot_grid(qda.kfoldCV_caret.ROC.plot,
 # | ----------------- | ---------- | ----------- | ----------- | --------- |
 # | QDA (`caret`)     | 0.2399     | 0.7743      | 0.7013      | 0.7377967 |
 # | QDA (`MASS`)      | 0.1692     | 0.8934      | 0.5714      | 0.7324227 |
-#   
+   
 
 save(qda.kfoldCV_MASS.plot, file = "dataset\\plot\\qda.kfoldCV_MASS.plot.Rdata")
 save(qda.kfoldCV_caret.ROC.plot, file = "dataset\\plot\\qda.kfoldCV_caret.ROC.plot.Rdata")
