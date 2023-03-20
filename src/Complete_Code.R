@@ -1441,3 +1441,645 @@ save(qda.kfoldCV_MASS.plot, file = "dataset\\plot\\qda.kfoldCV_MASS.plot.Rdata")
 save(qda.kfoldCV_caret.ROC.plot, file = "dataset\\plot\\qda.kfoldCV_caret.ROC.plot.Rdata")
 save(qda.kfoldCV_MASS.ROC.plot, file = "dataset\\plot\\qda.kfoldCV_MASS.ROC.plot.Rdata")
 
+
+
+#################################################################################################################
+#------------------------------------------------------Naive Bayes----------------------------------------------#
+#################################################################################################################
+
+## Model Construction
+#--------------------#
+#----Naive Bayes-----#
+#--------------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+nb_model <- train(good ~ ., 
+                  data = train, 
+                  method = "naive_bayes", 
+                  trControl = train_control)
+
+save(nb_model, file = "dataset\\model\\nb.model_kfoldCV.Rdata")
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\nb.model_kfoldCV.Rdata")
+
+nb.predictions <- predict(nb_model, newdata = test)
+
+confusionMatrix(nb.predictions, test$good)
+
+
+nb.predictions <- as.numeric(nb.predictions)
+pred_obj <- prediction(nb.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "Naive Bayes (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+nb.kfoldCV.ROC.plot <- recordPlot()
+
+pander::pander(nb_model$results)
+
+## Summary
+cowplot::plot_grid(nb.kfoldCV.ROC.plot)
+
+
+# | Model              | Error Rate | Sensitivity | Specificity | AUC       |
+# | ------------------ | ---------- | ----------- | ----------- | --------- |
+# | Naive Bayes        | 0.2466     | 0.7829      | 0.6360      | 0.7094563 |
+
+save(nb.kfoldCV.ROC.plot, file = "dataset\\plot\\nb.kfoldCV.ROC.plot.Rdata")
+
+
+#################################################################################################################
+#-------------------------------------------------------Decision Tree (CART)------------------------------------#
+#################################################################################################################
+# The CART (Classification and Regression Trees) algorithm is a decision tree method. CART is a popular algorithm used for both classification and regression problems. For our classification task, it constructs a binary tree in which each internal node represents a test on a single feature, and each leaf node represents a class label or a numeric value. The splitting of nodes in the tree is based on a measure of impurity such as Gini impurity or entropy. The CART algorithm is often used in applications such as finance, marketing, and healthcare.
+
+## Model Construction
+#----------------------#
+#----Decision Tree-----#
+#----------------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+dc_model <- train(good ~ ., 
+                  data = train, 
+                  method = "rpart2", 
+                  trControl = train_control,
+                  na.action = na.omit)
+
+save(dc_model, file = "dataset\\model\\dc.model_kfoldCV.Rdata")
+
+
+#----------------------------#
+#----Decision Tree (Mod)-----#
+#----------------------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+dc_model <- train(good ~ ., 
+                  data = train, 
+                  method = "rpart", 
+                  trControl = train_control,
+                  tuneLength = 5,
+                  tuneGrid = data.frame(cp = seq(0.001, 0.1, by = 0.005)))
+
+save(dc_model, file = "dataset\\model\\dc.model_kfoldCV_mod.Rdata")
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\dc.model_kfoldCV.Rdata")
+
+dc.predictions <- predict(dc_model, newdata = test)
+
+confusionMatrix(dc.predictions, test$good)
+
+
+dc.predictions <- as.numeric(dc.predictions)
+pred_obj <- prediction(dc.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "CART (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+dc.kfoldCV.ROC.plot <- recordPlot()
+
+dc_df <- data.frame(k= dc_model$results$maxdepth,
+                    Accuracy=dc_model$results$Accuracy,
+                    Kappa=dc_model$results$Kappa)
+
+dc.kfoldCV.plot <- accu.kappa.plot(dc_df) + 
+  geom_text(aes(x = k, y = Accuracy, label = round(Accuracy, 3)), hjust = -0.3, angle=90) +
+  geom_text(aes(x = k, y = Kappa, label = round(Kappa, 3)), hjust = -0.3, angle=90) +
+  labs(x="Max Depth")
+ggtitle("CART Model Performance")
+
+pander::pander(dc_model$results)
+
+### Tuned
+# Model Import
+load("dataset\\model\\dc.model_kfoldCV_mod.Rdata")
+
+dc.predictions <- predict(dc_model, newdata = test)
+
+confusionMatrix(dc.predictions, test$good)
+
+
+dc.predictions <- as.numeric(dc.predictions)
+pred_obj <- prediction(dc.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "CART Tuned (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+dc.kfoldCV_mod.ROC.plot <- recordPlot()
+
+pander::pander(dc_model$results)
+
+## Summary
+cowplot::plot_grid(dc.kfoldCV.ROC.plot, dc.kfoldCV_mod.ROC.plot, 
+                   ncol = 2, align = "hv", scale = 0.8)
+
+# | Model                | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | CART                 | 0.1827     | 0.9062      | 0.4644      | 0.6853261 |
+# | CART (Tuned)         | 0.1810     | 0.9115      | 0.4519      | 0.6816843 |
+
+save(dc.kfoldCV.ROC.plot, file = "dataset\\plot\\dc.kfoldCV.ROC.plot.Rdata")
+save(dc.kfoldCV_mod.ROC.plot, file = "dataset\\plot\\dc.kfoldCV_mod.ROC.plot.Rdata")
+
+
+#################################################################################################################
+#--------------------------------------------------------Random Forest------------------------------------------#
+#################################################################################################################
+
+## Model Construction
+#----------------------#
+#----Random Forest-----#
+#----------------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+rf_model <- train(good ~ ., 
+                  data = train, 
+                  method = "rf", 
+                  trControl = train_control)
+
+save(rf_model, file = "dataset\\model\\rf.model_kfoldCV.Rdata")
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\rf.model_kfoldCV.Rdata")
+
+rf.predictions <- predict(rf_model, newdata = test)
+
+confusionMatrix(rf.predictions, test$good)
+
+
+rf.predictions <- as.numeric(rf.predictions)
+pred_obj <- prediction(rf.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "Random Forest (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+rf.kfoldCV.ROC.plot <- recordPlot()
+
+pander::pander(rf_model$results)
+
+## Summary
+cowplot::plot_grid(rf.kfoldCV.ROC.plot)
+
+
+# | Model                | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | Random Forest        | 0.0471     | 0.9789      | 0.8494      | 0.9141488 |
+
+save(rf.kfoldCV.ROC.plot, file = "dataset\\plot\\rf.kfoldCV.ROC.plot.Rdata")
+
+
+#################################################################################################################
+#--------------------------------------------------------------Bagging------------------------------------------#
+#################################################################################################################
+
+## Model Construction
+#----------------#
+#----Bagging-----#
+#----------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+bag_model <- train(good ~ ., 
+                   data = train, 
+                   method = "treebag", 
+                   trControl = train_control)
+
+save(bag_model, file = "dataset\\model\\bag.model_kfoldCV.Rdata")
+
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\bag.model_kfoldCV.Rdata")
+
+bag.predictions <- predict(bag_model, newdata = test)
+
+confusionMatrix(bag.predictions, test$good)
+
+bag.predictions <- as.numeric(bag.predictions)
+
+pred_obj <- prediction(bag.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "Bagging (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+bag.kfoldCV.ROC.plot <- recordPlot()
+
+pander::pander(bag_model$results)
+
+## Summary
+cowplot::plot_grid(bag.kfoldCV.ROC.plot)
+
+# | Model                | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | Bagging              | 0.0497     | 0.9694      | 0.8745      | 0.9219593 |
+
+save(bag.kfoldCV.ROC.plot, file = "dataset\\plot\\bag.kfoldCV.ROC.plot.Rdata")
+
+
+
+#################################################################################################################
+#-----------------------------------------------------------Boosting--------------------------------------------#
+#################################################################################################################
+
+## Model Construction
+#--------------#
+#----boost-----#
+#--------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+boost_model <- train(good ~ ., 
+                     data = train, 
+                     method = "gbm", 
+                     trControl = train_control)
+
+save(boost_model, file = "dataset\\model\\boost.model_kfoldCV.Rdata")
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\boost.model_kfoldCV.Rdata")
+
+boost.predictions <- predict(boost_model, newdata = test)
+
+confusionMatrix(boost.predictions, test$good)
+
+boost.predictions <- as.numeric(boost.predictions)
+pred_obj <- prediction(boost.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "Boosting (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+boost.kfoldCV.ROC.plot <- recordPlot()
+
+pander::pander(boost_model$results)
+
+## SUmmary
+cowplot::plot_grid(boost.kfoldCV.ROC.plot)
+
+# | Model                | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | Boosting             | 0.1633     | 0.9389      | 0.4310      | 0.6849227 |
+
+save(boost.kfoldCV.ROC.plot, file = "dataset\\plot\\boost.kfoldCV.ROC.plot.Rdata")
+
+
+
+#################################################################################################################
+#-----------------------------------------------------Support Vector Machine------------------------------------#
+#################################################################################################################
+
+## Model Construction
+#------------#
+#----SVM-----#
+#------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+svm_model <- train(good ~ ., 
+                   data = train, 
+                   method = "svmRadial", 
+                   trControl = train_control)
+
+save(svm_model, file = "dataset\\model\\svm.model_kfoldCV.Rdata")
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\svm.model_kfoldCV.Rdata")
+
+svm.predictions <- predict(svm_model, newdata = test)
+
+confusionMatrix(svm.predictions, test$good)
+
+
+svm.predictions <- as.numeric(svm.predictions)
+pred_obj <- prediction(svm.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "SVM (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+svm.kfoldCV.ROC.plot <- recordPlot()
+
+pander::pander(svm_model$results)
+
+## Summary 
+cowplot::plot_grid(svm.kfoldCV.ROC.plot)
+
+
+# | Model                | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | SVM                  | 0.1641     | 0.9726      | 0.2929      | 0.6327449 |
+
+save(svm.kfoldCV.ROC.plot, file = "dataset\\plot\\svm.kfoldCV.ROC.plot.Rdata")
+
+
+#################################################################################################################
+#-----------------------------------------------------xTreme Gradient Boost-------------------------------------#
+#################################################################################################################
+
+## Model Construction
+#----------------#
+#----XGBoost-----#
+#----------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+xgboost_model <- train(good ~ ., 
+                       data = train, 
+                       method = "xgbTree",
+                       trControl = train_control,
+                       tuneGrid = expand.grid(nrounds = 100,
+                                              max_depth = 5,
+                                              eta = 0.05,
+                                              gamma = 0,
+                                              colsample_bytree = 0.5,
+                                              min_child_weight = 1,
+                                              subsample = 0.5),
+                       verbose = FALSE,
+                       metric = "Accuracy")
+
+save(xgboost_model, file = "dataset\\model\\xgboost.model_kfoldCV.Rdata")
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\xgboost.model_kfoldCV.Rdata")
+
+xgboost.predictions <- predict(xgboost_model, newdata = test)
+xgboost.predictions <- ifelse(xgboost.predictions == "X1", 1, 0)
+xgboost.predictions <- factor(xgboost.predictions, levels = c(0, 1))
+confusionMatrix(xgboost.predictions, test$good)
+
+xgboost.predictions <- as.numeric(xgboost.predictions)
+pred_obj <- prediction(xgboost.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "XGBoost (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+xgboost.kfoldCV.ROC.plot <- recordPlot()
+
+pander::pander(xgboost_model$results)
+
+## Summary
+cowplot::plot_grid(xgboost.kfoldCV.ROC.plot)
+
+# | Model                | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | XGBoost              | 0.1338     | 0.9589      | 0.4979      | 0.7284060 |
+
+save(xgboost.kfoldCV.ROC.plot, file = "dataset\\plot\\xgboost.kfoldCV.ROC.plot.Rdata")
+
+
+#################################################################################################################
+#-------------------------------------------------------Neural Network------------------------------------------#
+#################################################################################################################
+
+## Model Construction
+#-------------#
+#----NNet-----#
+#-------------#
+set.seed(1234)
+train_control <- trainControl(method = "cv", number = 10)
+
+set.seed(1234)
+nnet_model <- train(good ~ ., 
+                    data = train, 
+                    method = "nnet", 
+                    trControl = train_control)
+
+save(nnet_model, file = "dataset\\model\\nnet.model_kfoldCV.Rdata")
+
+## K-fold CV
+# Data Import
+load("dataset\\wine.data_cleaned.Rdata")
+load("dataset\\train.Rdata")
+load("dataset\\test.Rdata")
+
+# Function Import
+load("dataset\\function\\accu.kappa.plot.Rdata")
+
+# Model import
+load("dataset\\model\\nnet.model_kfoldCV.Rdata")
+
+nnet.predictions <- predict(nnet_model, newdata = test)
+
+confusionMatrix(nnet.predictions, test$good)
+
+
+nnet.predictions <- as.numeric(nnet.predictions)
+pred_obj <- prediction(nnet.predictions, test$good)
+auc_val <- performance(pred_obj, "auc")@y.values[[1]]
+auc_val
+
+roc_obj <- performance(pred_obj, "tpr", "fpr")
+plot(roc_obj, colorize = TRUE, lwd = 2,
+     xlab = "False Positive Rate", 
+     ylab = "True Positive Rate",
+     main = "Neural Network (10-fold CV)")
+abline(a = 0, b = 1)
+x_values <- as.numeric(unlist(roc_obj@x.values))
+y_values <- as.numeric(unlist(roc_obj@y.values))
+polygon(x = x_values, y = y_values, 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+polygon(x = c(0, 1, 1), y = c(0, 0, 1), 
+        col = rgb(0.3803922, 0.6862745, 0.9372549, alpha = 0.3),
+        border = NA)
+text(0.6, 0.4, paste("AUC =", round(auc_val, 4)))
+nnet.kfoldCV.ROC.plot <- recordPlot()
+
+pander::pander(nnet_model$results)
+
+## Summary
+cowplot::plot_grid(nnet.kfoldCV.ROC.plot)
+
+
+# | Model                | Error Rate | Sensitivity | Specificity | AUC       |
+# | -------------------- | ---------- | ----------- | ----------- | --------- |
+# | Neural Network       | 0.1818     | 0.9378      | 0.3431      | 0.6404628 |
+
+save(nnet.kfoldCV.ROC.plot, file = "dataset\\plot\\nnet.kfoldCV.ROC.plot.Rdata")
+
+
