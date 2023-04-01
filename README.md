@@ -31,9 +31,12 @@ Which of the following classifiers would you recommend? Justify your answer.
  ┃ ┣ 📄report.pdf
  ┃ ┗ 📄report.rmd
  ┣ 📂src                            // Source Code
- ┃ ┣ 📂data                         // Raw Data
- ┃ ┃ ┣ 📄winequality-white.csv
- ┃ ┃ ┗ 📄winequality.names
+ ┃ ┣ 📂dataset                         
+ ┃ ┃ ┣ 📂function  
+ ┃ ┃ ┣ 📂model
+ ┃ ┃ ┣ 📂plot 
+ ┃ ┃ ┣ 📄winequality-white.csv      // Raw Data
+ ┃ ┃ ┗ 📄winequality.names          // Raw Data Description
  ┃ ┣ 📄KNN.R
  ┃ ┣ 📄Logit.R
  ┃ ┣ 📄LDA.R
@@ -42,8 +45,7 @@ Which of the following classifiers would you recommend? Justify your answer.
  ┣ 📂usr                            // Contributtors
  ┃ ┣ 📂Alana
  ┃ ┣ 📂Leif
- ┃ ┣ 📂Sang
- ┃ ┗ 📂web   
+ ┃ ┗ 📂Sang   
  ┣ 📂web                            // Repository Website
  ┣ 📄.gitignore
  ┗ 📄README.md
